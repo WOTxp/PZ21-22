@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+
+<HTML>
+    <HEAD>
+        <style>
+
+            body{
+                margin: 0 !important;
+                color: #222222;
+                background-color: #FFFFFF;
+                font-family: 'Roboto', sans-serif;
+                font-size: 20px;
+            }
+
+            h2{
+                font-size: 24px;
+            }
+
+            a{
+                text-decoration: none;
+                color: #222222;
+            }
+            
+            #mainContainer{
+                width: 80%;
+                margin: auto;
+            }
+            
+            #containerForLogotype{
+                width: 100%;
+                margin: auto;
+                margin-top: 100px;
+            }
+            
+            #logotypeBox{
+                width: auto;
+                height: 48px;;
+                margin: auto;
+                font-size: 40px;
+                float: left;
+            }
+            
+            #logoImg{
+                float: left;
+            }
+            
+            #logoText{
+                margin-left: 8px;
+                margin-right: 8px;
+                float: left;
+                font-weight: bold;
+            }
+            
+            #containerForColors{
+                width: 100%;
+                margin-top: 100px;
+            }
+
+            #containerFontPresent{
+                width: 100%;
+                margin-top: 100px;
+            }
+            
+            .clear{
+                clear: both;
+            }
+            
+            .colorBox{
+                padding: 50px;
+                cursor: pointer;
+                box-shadow: 2px 2px #888888;
+                margin-bottom: 25px;
+            }
+
+            .textBox{
+                border-bottom: 1px solid #000000;
+                cursor: auto;
+                padding: 0px;
+                box-shadow: none;
+                font-size: 24px;
+                margin-bottom: 25px;
+            }
+            
+            .colorBlue{
+                background-color: #088AFC;
+                color: #FFFFFF;   
+            }
+            
+            .colorWhite{
+                background-color: #FFFFFF;
+                color: #000000;   
+            }
+            
+            .colorDarkWhite{
+                background-color: #EEEEEE;
+                color: #000000;   
+            }
+            
+            .colorBlack{
+                background-color: #000000;
+                color: #FFFFFF;   
+            }
+            
+            .colorLightBlack{
+                background-color: #222222;
+                color: #FFFFFF;   
+            }
+            
+            .enter100px{
+                width: 100%;
+                height: 100px;
+            }
+            
+            </style>
+
+        <script type="text/javascript">
+            function goToHrefWithText(valueToCopy){
+                window.focus();
+                navigator.clipboard.writeText(valueToCopy);
+                window.open("https://color.adobe.com/pl/create/color-wheel");
+            }
+        </script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+
+        <title>Mathio</title>
+        <link rel="icon" href="logo.svg" sizes="any" type="image/svg+xml">
+    </HEAD>
+    <BODY>
+        <div id="mainContainer">
+            <div id="containerForLogotype">
+                <div id="logotypeBox">                    
+                    <div id="logoImg">
+                        <img src="logo.svg" width="48px" height="48px"/>   
+                    </div>
+                    <div id="logoText">
+                        Mathio
+                    </div>
+                </div>
+            </div>
+
+            <div class="clear"></div>
+
+            <div id="containerForColors">
+                <div class="textBox">
+                    <h2>Suggested colors on page</h2>   
+                </div>
+                <div class="colorBox colorBlue" onclick="goToHrefWithText('#088AFC');">
+                    #088AFC
+                </div>
+                <div class="colorBox colorDarkWhite" onclick="goToHrefWithText('#EEEEEE');">
+                    #EEEEEE
+                </div>
+                <div class="colorBox colorWhite" onclick="goToHrefWithText('#FFFFFF');">
+                    #FFFFFF
+                </div>
+
+                <div class="enter100px"></div>
+
+                <div class="colorBox" style="border-bottom: 1px solid #000000; cursor: auto; padding: 0px; box-shadow: none; font-size: 24px;">
+                    <h2>Suggested colors for font</h2> 
+                </div>
+                <div class="colorBox colorBlack" onclick="goToHrefWithText('#000000');">
+                    #000000
+                </div>
+                <div class="colorBox colorLightBlack" onclick="goToHrefWithText('#222222');">
+                    #222222
+                </div>
+            </div>
+            <div id="containerFontPresent">
+                <div class="textBox">
+                    <h2 style="cursor=pointer;"><a href="https://fonts.google.com/specimen/Roboto?preview.text=roboto&preview.text_type=custom" target="_blank">Suggested font for page</a></h2>   
+                </div>
+
+                <p style="cursor=pointer; font-weight: bold;"><a href="https://fonts.google.com/specimen/Roboto?preview.text=roboto&preview.text_type=custom" target="_blank">Font name - Roboto</a></p>
+
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus feugiat erat ac elit ullamcorper, a pharetra urna auctor. Aenean sollicitudin porttitor leo, ut rutrum leo pulvinar eu. Ut ac tellus a turpis lobortis convallis. Nam pretium nunc neque, id ultricies libero ultricies sit amet. Mauris consequat ligula sed hendrerit accumsan. Aenean vulputate eleifend lacus, a accumsan orci ullamcorper sed. Quisque sit amet ante ipsum.
+                </p>
+
+                <p>
+                    <i> Maecenas quis urna nec ligula placerat malesuada quis non diam. Fusce a varius turpis. Curabitur eleifend lacus a convallis consectetur. Nulla auctor metus quam, ac pulvinar diam interdum id. Integer sit amet felis arcu. Sed ac sem ex. In blandit fermentum dui, ac fermentum ante fringilla imperdiet. Nullam sollicitudin lorem ipsum, eget auctor velit maximus ut. Duis ac gravida mi, vel euismod tortor. In hac habitasse platea dictumst. Integer fermentum vitae urna quis sollicitudin. </i>
+                </p>
+
+                <p>
+                    <b> Integer ac mi leo. Ut venenatis enim vitae tempor volutpat. Sed eget tempor neque. Nullam sed metus et nunc interdum semper. Quisque quis elit semper, varius erat ac, convallis ante. Pellentesque a orci non justo imperdiet iaculis vel ac ex. In quis mauris nulla. Quisque tristique, turpis sagittis aliquam fermentum, lorem sapien dictum nibh, nec molestie ipsum tellus a felis. Quisque auctor dignissim orci quis ullamcorper. Donec eget nibh sed arcu convallis varius. Cras nec dictum libero, eu facilisis diam. Phasellus urna felis, fermentum ut euismod nec, condimentum pellentesque nulla. Nulla congue eros est, eu porta orci pretium blandit. </b>
+                </p>
+
+                <p>
+                    <b> <i> In tempor volutpat magna. Praesent ullamcorper dui nulla, quis placerat lacus volutpat sit amet. Curabitur at dictum enim. Maecenas fringilla metus aliquam, lacinia lacus et, laoreet odio. Integer ut tempus nulla. Aenean sit amet nisi non risus hendrerit congue. Donec varius, neque in ultrices porttitor, dui lectus pharetra orci, ac imperdiet ligula est at nisl. Duis iaculis, nulla in vulputate congue, ex lorem maximus nisl, nec egestas ex mauris a sem. Ut efficitur, ex vitae fermentum porta, nulla eros bibendum felis, nec consequat dolor ligula a odio. Ut aliquam enim ut erat consequat, nec tincidunt risus feugiat. Quisque mattis tortor id elit faucibus, eleifend fringilla nunc posuere. Nullam eleifend lectus sem, tincidunt consequat ligula pulvinar eu. Vivamus congue eu arcu id porttitor. Duis orci erat, rutrum nec nibh condimentum, tristique placerat velit. Curabitur vel nulla quis metus rhoncus congue. </i> </b>
+                </p>
+            </div>
+
+            <div class="textBox" style="margin-bottom: 50px; margin-top: 50px;"></div>
+        </div>
+    </BODY>
+</HTML>
