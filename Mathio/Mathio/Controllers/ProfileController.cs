@@ -16,7 +16,9 @@ public class ProfileController : Controller
     {
         return View();
     }
-
+    public Task<IActionResult> Register(User user){
+        return None;
+    }
     public IActionResult SignIn()
     {
         return View();
