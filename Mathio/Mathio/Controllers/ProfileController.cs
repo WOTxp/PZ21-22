@@ -24,6 +24,13 @@ public class ProfileController : Controller
     {
         return View();
     }
+    [HttpPost]
+    public async Task<IActionResult> Register(UserModel userModel)
+    {
+        //create the user
+        await _auth.CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName ,true);
+        return RedirectToAction("SignIn");
+    }
     
     public IActionResult SignIn()
     {
