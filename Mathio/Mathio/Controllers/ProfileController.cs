@@ -62,6 +62,11 @@ public class ProfileController : Controller
             return View();
         }
     }
+
+    public IActionResult LogOut(){
+        HttpContext.Session.Remove("_UserToken");
+        return RedirectToAction("SignIn");
+    }
     
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
