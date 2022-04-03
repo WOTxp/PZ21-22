@@ -27,9 +27,30 @@ public class ProfileController : Controller
     [HttpPost]
     public async Task<IActionResult> Register(UserModel userModel)
     {
-        //create the user
-        await _auth.CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName ,true);
-        return RedirectToAction("SignIn");
+        try
+        {
+            //create the user
+            await _auth.CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
+                true);
+            TempData["msg"] = "Pomyslnie zarejestrowano";
+            return RedirectToAction("SignIn");
+        }
+        catch(FirebaseAuthException e){
+            switch (e.Reason)
+            {
+                case AuthErrorReason.EmailExists:
+                    ViewBag.Reason = "Konto z tym adresem e-mail już istnieje";
+                    break;
+                case AuthErrorReason.WeakPassword:
+                    ViewBag.Reason = "Hasło nie spełnia wymagań bezpieczeństwa";
+                    break;
+                default:
+                    ViewBag.Reason = e.Reason;
+                    break;
+            }
+
+            return View();
+        }
     }
     
     public IActionResult SignIn()
@@ -39,26 +60,45 @@ public class ProfileController : Controller
     [HttpPost]
     public async Task<IActionResult> SignIn(UserModel userModel)
     {
-        //log in the new user
-        var fbAuth = await _auth
-            .SignInWithEmailAndPasswordAsync(userModel.Email, userModel.Password);
-        await fbAuth.RefreshUserDetails();
-        string token = fbAuth.FirebaseToken;
-        //saving the token in a session variable
-        if (token != null && fbAuth.User.IsEmailVerified)
+        try
         {
-            HttpContext.Session.SetString("_UserToken", token);
+            //log in the new user
+            var fbAuth = await _auth
+                .SignInWithEmailAndPasswordAsync(userModel.Email, userModel.Password);
+            await fbAuth.RefreshUserDetails();
+            string token = fbAuth.FirebaseToken;
+            //saving the token in a session variable
+            if (token != null && fbAuth.User.IsEmailVerified)
+            {
+                HttpContext.Session.SetString("_UserToken", token);
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
+            else if (!fbAuth.User.IsEmailVerified)
+            {
+                ViewBag.Reason = "Login failed: Email Not Verified!";
+                return View();
+            }
+            else
+            {
+                ViewBag.Reason = "Login failed!";
+                return View();
+            }
         }
-        else if(!fbAuth.User.IsEmailVerified)
+        catch (FirebaseAuthException e)
         {
-            ViewBag.Reason = "Login failed: Email Not Verified!";
-            return View();
-        }
-        else
-        {
-            ViewBag.Reason = "Login failed!";
+            switch (e.Reason)
+            {
+                case AuthErrorReason.WrongPassword:
+                    ViewBag.Reason = "Nieprawidłowe hasło";
+                    break;
+                case AuthErrorReason.UnknownEmailAddress:
+                    ViewBag.Reason = "Nieznany adres e-mail";
+                    break;
+                default:
+                    ViewBag.Reason = e.Reason;
+                    break;
+            }
             return View();
         }
     }

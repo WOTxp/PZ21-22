@@ -23,12 +23,12 @@ public class HomeController : Controller
     }
     
     //for future use (may be deleted)
-    public UserModel GetUserFromToken(string token)
+    public UserModel? GetUserFromToken(string token)
     {
         var user = _auth.GetUserAsync(token).Result;
         if(user != null)
         {
-            UserModel u = new UserModel();
+            UserModel? u = new UserModel();
             u.Email = user.Email;
             u.UserName = user.DisplayName;
             return u;
@@ -38,7 +38,7 @@ public class HomeController : Controller
 
     public IActionResult Privacy()
     {
-        string token = HttpContext.Session.GetString("_UserToken");
+        var token = HttpContext.Session.GetString("_UserToken");
         if (token != null)
         {
             return View();
