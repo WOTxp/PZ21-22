@@ -9,22 +9,30 @@
     <link rel="stylesheet" href="~/Mathio.styles.css" asp-append-version="true"/>
 </head>
 <body>
-
-
-
-<ul class="sidenav">
-    <li class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Mathio</li>
-    <li class="active"><a href="#">logowanie</a></li>
-    <li><a href="#">rejestracja</a></li>
-    <li><a href="#">Wypróbuj</a></li>
-</ul>
-
-
-<div class="container">
-    <main role="main" class="pb-3">
+<main role="main" class="pb-3 m-0 p-0">
+    <div class="d-flex flex-column  bg-light" style="width: 15%">
+        <ul class="sidenav">
+            <a asp-area="" asp-controller="Home" asp-action="Index">
+                <button type="button" class="btn btn-primary btn-lg btn-block w-100 p-3 mt-2">Mathio</button>
+            </a>
+            <a asp-area="" asp-controller="Profile" asp-action="SignIn">
+                <button type="button" class="btn btn-primary btn-lg btn-block w-100 p-3 mt-2">Logowanie</button>
+            </a>
+            <a asp-area="" asp-controller="Profile" asp-action="Register">
+                <button type="button" class="btn btn-primary btn-lg btn-block w-100 p-3 mt-2">Rejestracja</button>
+            </a>
+            <a asp-area="" asp-controller="Profile" asp-action="LogOut">
+                <button type="button" class="btn btn-primary btn-lg btn-block w-100 p-3 mt-2">Wyloguj</button>
+            </a>
+            
+        </ul>
+    </div>
+    <div class="container p-4" style="width: 85%; position: absolute; right: 0px">
         @RenderBody()
-    </main>
-</div>
+    </div>
+</main>
+
+
 
 
 

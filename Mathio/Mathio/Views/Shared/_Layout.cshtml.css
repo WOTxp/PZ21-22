@@ -41,20 +41,23 @@ button.accept-policy {
 
 .footer {
   position: absolute;
+  right: 0;
   bottom: 0;
-  width: 100%;
+  width: 85%;
   white-space: nowrap;
   line-height: 60px;
+  height: 8%;
 }
 ul.sidenav {
   list-style-type: none;
   margin: 0;
-  padding: 0;
-  width: 25%;
+  padding: 0px;
+  width: 15%;
   background-color: #f1f1f1;
-  position: fixed;
+  position: absolute;
   height: 100%;
   overflow: auto;
+  text-align: center;
 }
 
 ul.sidenav li a {
@@ -99,3 +102,4 @@ div.content {
     float: none;
   }
 }
+
