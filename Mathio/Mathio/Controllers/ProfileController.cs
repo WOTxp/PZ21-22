@@ -32,7 +32,7 @@ public class ProfileController : Controller
             //create the user
             await _auth.CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
                 true);
-            TempData["msg"] = "Pomyslnie zarejestrowano";
+            TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");
         }
         catch(FirebaseAuthException e){
