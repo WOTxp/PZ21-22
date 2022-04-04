@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace TestingApp.Models;
+namespace Mathio.Models;
 
 public class UserModel
 {

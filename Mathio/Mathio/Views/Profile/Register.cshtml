@@ -1,41 +1,128 @@
-﻿@model TestingApp.Models.UserModel
+﻿@model Mathio.Models.UserModel
 
 @{
     ViewData["Title"] = "Register";
 }
 
-<h1>Register</h1>
+<style>
 
-<h4>UserModel</h4>
-<hr />
+body{
+    background-color: #EEEEEE;
+}
+
+.content{
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-radius: 25px;
+    box-shadow: 2px 2px 2px #888888;
+    margin-top: 25px;
+}
+
+.field-group-extra{
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.submit-group-extra{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.field-extra{
+    margin-top: 20px;
+    border-radius: 25px;
+}
+
+.submit-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.submit-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #FFFFFF;
+    color: #222222;
+    border: 2px #E0E0E0 solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra:hover{
+    background-color: #F0F0F0;
+    color: #222222;
+    border: 2px #CCCCCC solid;
+    text-shadow: 0 0 0.5px #888888;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.hide{
+    display: none;
+}
+
+.main-name{
+    color: #222222;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+}
+
+</style>
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Register">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="UserName" class="control-label"></label>
-                <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" type="password"/>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4 text-center">
+        <div class="content">
+            <div class="main-name">Rejestracja</div>
+            <form asp-action="Register">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group text-center field-group-extra">
+                    <label asp-for="UserName" class="control-label hide"></label>
+                    <input asp-for="UserName" class="form-control field-extra" placeholder="Login" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group text-center field-group-extra">
+                    <label asp-for="Email" class="control-label hide"></label>
+                    <input asp-for="Email" class="form-control field-extra" placeholder="E-mail" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group text-center field-group-extra">
+                    <label asp-for="Password" class="control-label hide"></label>
+                    <input asp-for="Password" class="form-control field-extra" type="password" placeholder="Hasło" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group text-center submit-group-extra">
+                    <input type="submit" value="Zarejestruj" class="btn btn-primary submit-extra" />
+                    <a href="/Profile/SignIn"><input type="button" class="btn btn-primary button-extra" value="Logowanie" /></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
 </div>
 
 @section Scripts {
