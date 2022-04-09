@@ -41,8 +41,8 @@ public class ProfileController : Controller
             userModel.Type = "user";
             userModel.Points = 0;
             CollectionReference usersRef = _db.Collection("Users");
-            await usersRef.AddAsync(userModel);
-            
+            await usersRef.Document(userModel.ID).SetAsync(userModel);
+
             TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");
         }
