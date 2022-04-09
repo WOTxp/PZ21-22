@@ -87,9 +87,14 @@ body{
     font-size: 24px;
 }
 
+.news{
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
 </style>
 
-<h3>@ViewBag.Reason</h3>
 <div class="row">
 
     <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
@@ -114,6 +119,8 @@ body{
                     <a href="/Profile/Register"><input type="button" class="btn btn-primary button-extra" value="Rejestracja" /></a>
                 </div>
             </form>
+            <div class="news text-danger">@ViewBag.Reason</div>
+            <div class="news text-success">@TempData["msg"]</div>
         </div>
     </div>
 
