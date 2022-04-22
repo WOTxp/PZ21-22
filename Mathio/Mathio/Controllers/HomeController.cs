@@ -50,31 +50,6 @@ public class HomeController : Controller
         return RedirectToAction("SignIn", "Profile");
     }
 
-    public async Task<List<TasksModel>> GetTasks()
-    {
-        CollectionReference usersRef = _db.Collection("Tasks");
-        QuerySnapshot snapshot = await usersRef.GetSnapshotAsync();
-        List<TasksModel> tasks = new List<TasksModel>();
-        foreach (DocumentSnapshot document in snapshot.Documents)
-        {
-            tasks.Add(document.ConvertTo<TasksModel>());
-        }
-
-        return tasks;
-    }
-
-    public async Task<string> ShowTasks()
-    {
-        List<TasksModel> tasks = await GetTasks();
-        string st = "";
-        foreach (TasksModel task in tasks)
-        {
-            st += task.ToString();
-        }
-
-        return st;
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

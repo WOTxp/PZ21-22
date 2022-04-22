@@ -1,0 +1,21 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Tasks";
+}
+<div id="data" class="w-100 h-25">
+    <h1>Male testy</h1>
+    <button class="btn" id="load">Zaladuj</button>
+    <div id="inner"></div>
+</div>
+
+<script type="text/javascript" defer>
+    $("#load").on("click", function () {
+    $.ajax({
+        url: '@Url.Action("LoadMoreTasks", "Tasks")',
+        success: function (response) {
+            $("#inner").append(response);
+            alert(response)
+        }
+    });
+});
+</script>

@@ -1,0 +1,15 @@
+﻿@model Dictionary<string,List<Mathio.Models.TasksModel>>
+<div class="Batch">
+    <h1>Zaladowano</h1>
+    @{
+        foreach (var tasks_list in Model)
+        {
+            <h1>@tasks_list.Key</h1>
+            <h1>-------------------------------</h1>
+            foreach (var task in tasks_list.Value)
+            {
+                <partial name="_Task" model="task"/>
+            }
+        }
+    }
+</div>
