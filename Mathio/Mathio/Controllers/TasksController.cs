@@ -10,30 +10,33 @@ public class TasksController : Controller
 {
     private FirestoreDb _db;
     private List<string> classes;
+    private static int _currentCategory;
+    private static string? _lastDocID;
     public TasksController()
     {
         _db = FirestoreDb.Create("pz202122-cf12f");
-        classes = new List<string>();
-        classes.Add("Test1");
-        classes.Add("Test2");
-        classes.Add("Test3");
+        classes = new List<string>
+        {
+            "Test1",
+            "Test2",
+            "Test3"
+        };
     }
     // GET
     public IActionResult Index()
     {
-        HttpContext.Session.SetString("_lastDoc", "");
+        _currentCategory = 0;
+        _lastDocID = "";
         return View();
     }
     
     public async Task<List<TasksModel>> GetTasksCategoryBatch(string category, int batchSize)
     {
         Query  tasksQuery = _db.Collection("Tasks").WhereEqualTo("Category", category);
-
-
-        var sessionValue = HttpContext.Session.GetString("_lastDoc");
-        if (!String.IsNullOrEmpty(sessionValue))
+        
+        if (!String.IsNullOrEmpty(_lastDocID))
         {
-            DocumentSnapshot lastDoc  = await _db.Collection("Tasks").Document(sessionValue).GetSnapshotAsync();
+            DocumentSnapshot lastDoc  = await _db.Collection("Tasks").Document(_lastDocID).GetSnapshotAsync();
             tasksQuery = tasksQuery.StartAfter(lastDoc);
         }
         tasksQuery = tasksQuery.Limit(batchSize);
@@ -45,7 +48,7 @@ public class TasksController : Controller
             tasks.Add(document.ConvertTo<TasksModel>());
         }
 
-        HttpContext.Session.SetString("_lastDoc", snapshot.Documents.Count > 0 ? snapshot.Documents.Last().Id : "");
+        _lastDocID = snapshot.Documents.Count > 0 ? snapshot.Documents.Last().Id : "";
         return tasks;
     }
 
@@ -53,20 +56,18 @@ public class TasksController : Controller
     {
         int batchSize = 2;
         int currentnum = 0;
-        int category = HttpContext.Session.GetInt32("_CurrentNum") ?? 0;
 
         Dictionary<string,List<TasksModel>> tasksBatchAll = new Dictionary<string, List<TasksModel>>();
-        while(category < classes.Count && currentnum < batchSize)
+        while(_currentCategory < classes.Count && currentnum < batchSize)
         {
-            List<TasksModel> tasksBatch = await  GetTasksCategoryBatch(classes[category], batchSize - currentnum);
+            List<TasksModel> tasksBatch = await  GetTasksCategoryBatch(classes[_currentCategory], batchSize - currentnum);
             currentnum += tasksBatch.Count;
-            tasksBatchAll.TryAdd(classes[category],new List<TasksModel>());
-            tasksBatchAll[classes[category]].AddRange(tasksBatch);
+            tasksBatchAll.TryAdd(classes[_currentCategory],new List<TasksModel>());
+            tasksBatchAll[classes[_currentCategory]].AddRange(tasksBatch);
             if (currentnum < batchSize)
             {
-                category += 1;
-                HttpContext.Session.SetInt32("_CurrentNum", category);
-                HttpContext.Session.SetString("_lastDoc", "");
+                _currentCategory += 1;
+                _lastDocID = "";
             }
         }
 
@@ -75,10 +76,9 @@ public class TasksController : Controller
 
     public async Task<string> ShowTasks()
     {
-        var sessionValue = HttpContext.Session.GetString("_lastDoc");
-        if (!String.IsNullOrEmpty(sessionValue))
+        if (!String.IsNullOrEmpty(_lastDocID))
         {
-            DocumentSnapshot lastDoc  = await _db.Collection("Tasks").Document(sessionValue).GetSnapshotAsync();
+            DocumentSnapshot lastDoc  = await _db.Collection("Tasks").Document(_lastDocID).GetSnapshotAsync();
             return lastDoc.Id;
         }
         return "Brak";
