@@ -12,6 +12,7 @@ public class TasksController : Controller
     private List<string> classes;
     private static int _currentCategory;
     private static string? _lastDocID;
+    private static int _lastDocCategory;
     public TasksController()
     {
         _db = FirestoreDb.Create("pz202122-cf12f");
@@ -26,6 +27,7 @@ public class TasksController : Controller
     public IActionResult Index()
     {
         _currentCategory = 0;
+        _lastDocCategory = -1;
         _lastDocID = "";
         return View();
     }
@@ -49,6 +51,7 @@ public class TasksController : Controller
         }
 
         _lastDocID = snapshot.Documents.Count > 0 ? snapshot.Documents.Last().Id : "";
+        _lastDocCategory = _currentCategory;
         return tasks;
     }
 
@@ -60,10 +63,13 @@ public class TasksController : Controller
         Dictionary<string,List<TasksModel>> tasksBatchAll = new Dictionary<string, List<TasksModel>>();
         while(_currentCategory < classes.Count && currentnum < batchSize)
         {
+            string category = _currentCategory == _lastDocCategory ? "NoCategory" : classes[_currentCategory];
+            tasksBatchAll.TryAdd(category, new List<TasksModel>());
+            
             List<TasksModel> tasksBatch = await  GetTasksCategoryBatch(classes[_currentCategory], batchSize - currentnum);
             currentnum += tasksBatch.Count;
-            tasksBatchAll.TryAdd(classes[_currentCategory],new List<TasksModel>());
-            tasksBatchAll[classes[_currentCategory]].AddRange(tasksBatch);
+            
+            tasksBatchAll[category].AddRange(tasksBatch);
             if (currentnum < batchSize)
             {
                 _currentCategory += 1;

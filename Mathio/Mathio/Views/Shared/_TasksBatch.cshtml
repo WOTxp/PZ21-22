@@ -1,14 +1,15 @@
-﻿@model Dictionary<string,List<Mathio.Models.TasksModel>>
-<div class="Batch">
-    @{
-        foreach (var tasks_list in Model)
+﻿@model Dictionary<string, List<Mathio.Models.TasksModel>>
+@{
+    foreach (var tasks_list in Model)
+    {
+        if (tasks_list.Key != "NoCategory")
         {
             <h1>@tasks_list.Key</h1>
             <h1>-------------------------------</h1>
-            foreach (var task in tasks_list.Value)
-            {
-                <partial name="_Task" model="task"/>
-            }
+        }
+        foreach (var task in tasks_list.Value)
+        {
+            <partial name="_Task" model="task"/>
         }
     }
-</div>
+}
