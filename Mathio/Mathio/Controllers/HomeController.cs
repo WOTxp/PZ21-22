@@ -37,17 +37,6 @@ public class HomeController : Controller
         return null;
     }
 
-    public IActionResult Privacy()
-    {
-        var token = HttpContext.Session.GetString("_UserToken");
-        if (token != null)
-        {
-            return View();
-        }
-
-        return RedirectToAction("SignIn", "Profile");
-    }
-    
     public string Databasetest()
     {
         FirestoreDb db = FirestoreDb.Create("pz202122-cf12f");

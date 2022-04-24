@@ -1,27 +1,9 @@
-﻿@model Mathio.Models.ChangePasswordModel
-@{
+﻿@{
     ViewData["Title"] = "My Profile";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <form asp-action="ChangePassword">
-        <div class="form-group text-center field-group-extra">
-            <label asp-for="OldPassword" class="control-label hide">Wpisz aktualne hasło</label>
-            <input asp-for="OldPassword" class="form-control field-extra" type="password" placeholder="Hasło" />
-            <span asp-validation-for="OldPassword" class="text-danger"></span>
-        </div>
-        <div class="form-group text-center field-group-extra">
-            <label asp-for="NewPassword" class="control-label hide">Wpisz nowe hasło</label>
-            <input asp-for="NewPassword" class="form-control field-extra" type="password" placeholder="Nowe hasło" />
-            <span asp-validation-for="NewPassword" class="text-danger"></span>
-        </div>
-        <input type="submit"/>
-    </form>
-    
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
