@@ -48,7 +48,7 @@ public class ProfileController : Controller
                 };
                 return View("Settings/Index", userModel);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return RedirectToAction("SignIn");
             }
@@ -167,7 +167,7 @@ public class ProfileController : Controller
             string uid = user.LocalId;
             Console.Write("UID:");
             Console.WriteLine(uid);
-            var fbAuth = await _auth.SignInWithEmailAndPasswordAsync(user.Email, data.OldPassword);
+            await _auth.SignInWithEmailAndPasswordAsync(user.Email, data.OldPassword);
             
             UserRecordArgs args = new UserRecordArgs()
             {
@@ -194,7 +194,7 @@ public class ProfileController : Controller
                     break;
             }
         }
-        catch (System.ArgumentException e)
+        catch (ArgumentException)
         {
             ViewBag.Reason = "Nowe hasło nie spełnia wymagań bezpieczeństwa";
         }
@@ -212,7 +212,7 @@ public class ProfileController : Controller
     {
         Console.WriteLine("Email:");
         Console.WriteLine(email);
-        string token = HttpContext.Session.GetString("_UserToken");
+        string? token = HttpContext.Session.GetString("_UserToken");
         string uid = _auth.GetUserAsync(token).Result.LocalId;
         UserRecordArgs args = new UserRecordArgs()
         {
@@ -229,7 +229,7 @@ public class ProfileController : Controller
     {
         Console.WriteLine("DisplayName:");
         Console.WriteLine(dName);
-        string token = HttpContext.Session.GetString("_UserToken");
+        string? token = HttpContext.Session.GetString("_UserToken");
         string uid = _auth.GetUserAsync(token).Result.LocalId;
         UserRecordArgs args = new UserRecordArgs()
         {
