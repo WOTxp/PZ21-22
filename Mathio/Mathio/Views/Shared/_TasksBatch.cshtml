@@ -4,8 +4,10 @@
     {
         if (tasks_list.Key != "NoCategory")
         {
-            <h1>@tasks_list.Key</h1>
-            <h1>-------------------------------</h1>
+            <div id="taskCategory">
+                <h1>@tasks_list.Key</h1>
+                <h1>-------------------------------</h1>
+            </div>
         }
         foreach (var task in tasks_list.Value)
         {
