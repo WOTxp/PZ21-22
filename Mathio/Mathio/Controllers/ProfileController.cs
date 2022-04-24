@@ -2,6 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Firebase.Auth;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
+using FirebaseAuth = FirebaseAdmin.Auth.FirebaseAuth;
+using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
 
 namespace Mathio.Controllers;
 
@@ -13,6 +18,10 @@ public class ProfileController : Controller
     {
         _auth = new FirebaseAuthProvider(
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
+        if (FirebaseAuth.DefaultInstance==null)
+        {
+            FirebaseApp.Create();
+        }
     }
     // GET
     public IActionResult Index()
@@ -32,7 +41,7 @@ public class ProfileController : Controller
             //create the user
             await _auth.CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
                 true);
-            TempData["msg"] = "Pomyslnie zarejestrowano";
+            TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");
         }
         catch(FirebaseAuthException e){
@@ -71,17 +80,16 @@ public class ProfileController : Controller
             if (token != null && fbAuth.User.IsEmailVerified)
             {
                 HttpContext.Session.SetString("_UserToken", token);
-
                 return RedirectToAction("Index");
             }
             else if (!fbAuth.User.IsEmailVerified)
             {
-                ViewBag.Reason = "Login failed: Email Not Verified!";
+                ViewBag.Reason = "Email nie zweryfikowany!";
                 return View();
             }
             else
             {
-                ViewBag.Reason = "Login failed!";
+                ViewBag.Reason = "Nieudane logowanie!";
                 return View();
             }
         }
@@ -102,9 +110,10 @@ public class ProfileController : Controller
             return View();
         }
     }
-
-    public IActionResult LogOut(){
+    [HttpPost]
+    public IActionResult LogOut(string msg="Pomyślnie wylogowano"){
         HttpContext.Session.Remove("_UserToken");
+        TempData["msg"] = msg;
         return RedirectToAction("SignIn");
     }
     
@@ -112,5 +121,76 @@ public class ProfileController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePasswordModel data)
+    {
+        Console.WriteLine("Haslo");
+        Console.WriteLine(data.OldPassword);
+        Console.WriteLine("Nowe haslo:");
+        Console.WriteLine(data.NewPassword);
+        if (data.OldPassword == null)
+        {
+            Console.WriteLine("Nie podano aktualnego hasła");
+            return RedirectToAction("Index");
+        }
+
+        if (data.NewPassword == null)
+        {
+            Console.WriteLine("Nie podano nowego hasła");
+            return RedirectToAction("Index");
+        }
+        string? token = HttpContext.Session.GetString("_UserToken");
+        Console.WriteLine("token:");
+        Console.WriteLine(token);
+        var user = await _auth.GetUserAsync(token);
+        string uid = user.LocalId;
+        Console.Write("UID:");
+        Console.WriteLine(uid);
+        try
+        {
+            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+            Console.WriteLine(userRecord.Email);
+            var fbAuth = await _auth.SignInWithEmailAndPasswordAsync(userRecord.Email, data.OldPassword);
+            
+            UserRecordArgs args = new UserRecordArgs()
+            {
+                Uid = uid,
+                Password = data.NewPassword
+            };
+            await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
+            Console.WriteLine("Pomyślnie zmieniono hasło");
+            string msg = "Pomyślnie zmieniono hasło. Zaloguj się ponownie";
+            return LogOut(msg);
+
+        }
+        catch (FirebaseAuthException e)
+        {
+            switch (e.Reason)
+            {
+                case AuthErrorReason.WrongPassword:
+                    Console.WriteLine("Nieprawidłowe hasło");
+                    break;
+                case AuthErrorReason.MissingPassword:
+                    Console.WriteLine("Nie podano aktualnego hasła");
+                    break;
+                default:
+                    Console.WriteLine(e.Reason);
+                    break;
+            }
+        }
+        catch (System.ArgumentException e)
+        {
+            Console.WriteLine("Nowe hasło nie spełnia wymagań bezpieczeństwa");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.GetType());
+            Console.WriteLine(e.Message);
+        }
+        
+        
+        return RedirectToAction("Index");
     }
 }
