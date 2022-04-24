@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Firebase.Auth;
 using FirebaseAdmin;
 using FirebaseAdmin.Auth;
-using Google.Apis.Auth.OAuth2;
-using Google.Protobuf;
 using FirebaseAuth = FirebaseAdmin.Auth.FirebaseAuth;
 using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
 
