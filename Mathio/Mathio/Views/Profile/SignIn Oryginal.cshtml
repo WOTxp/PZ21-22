@@ -1,7 +1,7 @@
 ﻿@model Mathio.Models.UserModel
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "SignIn";
 }
 
 <style>
@@ -101,30 +101,26 @@ body{
 
     <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
         <div class="content">
-            <div class="main-name">Rejestracja</div>
-            <form asp-action="Register">
+            <div class="main-name">Logowanie</div>
+            <form asp-action="SignIn">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group text-center field-group-extra">
-                    <label asp-for="UserName" class="control-label hide"></label>
-                    <input asp-for="UserName" class="form-control field-extra" placeholder="Login" />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
-                </div>
-                <div class="form-group text-center field-group-extra">
                     <label asp-for="Email" class="control-label hide"></label>
-                    <input asp-for="Email" class="form-control field-extra" placeholder="E-mail" />
+                    <input asp-for="Email" class="form-control field-extra" placeholder="E-mail"/>
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="form-group text-center field-group-extra">
                     <label asp-for="Password" class="control-label hide"></label>
-                    <input asp-for="Password" class="form-control field-extra" type="password" placeholder="Hasło" />
+                    <input asp-for="Password" class="form-control field-extra" type="password" placeholder="Hasło"/>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="form-group text-center submit-group-extra">
-                    <input type="submit" value="Zarejestruj" class="btn btn-primary submit-extra" />
-                    <a href="/Profile/SignIn"><input type="button" class="btn btn-primary button-extra" value="Logowanie" /></a>
+                    <input type="submit" value="Zaloguj" class="btn btn-primary submit-extra" />
+                    <a href="/Profile/Register"><input type="button" class="btn btn-primary button-extra" value="Rejestracja" /></a>
                 </div>
             </form>
             <div class="news text-danger">@ViewBag.Reason</div>
+            <div class="news text-success">@TempData["msg"]</div>
         </div>
     </div>
 
