@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Profile Settings";
+}
+
+<partial name="Settings/_UpdateProfile" model="Model"/>
+<partial name="Settings/_ChangePassword" model="null"/>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
