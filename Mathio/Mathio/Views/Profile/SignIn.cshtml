@@ -11,14 +11,14 @@ body{
 }
 
 .content{
+    margin: auto;
     background-color: #FFFFFF;
     padding-left: 30px;
     padding-right: 30px;
     padding-top: 20px;
     padding-bottom: 20px;
-    border-radius: 25px;
-    box-shadow: 2px 2px 2px #888888;
     margin-top: 25px;
+    min-width: 375px;
 }
 
 .field-group-extra{
@@ -87,6 +87,12 @@ body{
     font-size: 24px;
 }
 
+.news{
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
 </style>
 
 <h3>@ViewBag.Reason</h3>
@@ -95,7 +101,7 @@ body{
 
     <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
 
-    <div class="col-12 col-sm-8 col-md-6 col-lg-4 text-center">
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
         <div class="content">
             <div class="main-name">Logowanie</div>
             <form asp-action="SignIn">
@@ -115,6 +121,8 @@ body{
                     <a href="/Profile/Register"><input type="button" class="btn btn-primary button-extra" value="Rejestracja" /></a>
                 </div>
             </form>
+            <div class="news text-danger">@ViewBag.Reason</div>
+            <div class="news text-success">@TempData["msg"]</div>
         </div>
     </div>
 

@@ -6,12 +6,15 @@ using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using FirebaseAuth = FirebaseAdmin.Auth.FirebaseAuth;
 using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
+using Google.Cloud.Firestore;
+
 
 namespace Mathio.Controllers;
 
 public class ProfileController : Controller
 {
     private FirebaseAuthProvider _auth;
+    private FirestoreDb _db;
 
     public ProfileController()
     {
@@ -21,6 +24,7 @@ public class ProfileController : Controller
         {
             FirebaseApp.Create();
         }
+        _db = FirestoreDb.Create("pz202122-cf12f");
     }
     // GET
     public IActionResult Index()
@@ -61,8 +65,16 @@ public class ProfileController : Controller
         try
         {
             //create the user
-            await _auth.CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
+            var fbAuth = await _auth.
+                CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
                 true);
+
+            userModel.ID = fbAuth.User.LocalId;
+            userModel.Type = "user";
+            userModel.Points = 0;
+            CollectionReference usersRef = _db.Collection("Users");
+            await usersRef.Document(userModel.ID).SetAsync(userModel);
+
             TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");
         }
