@@ -2,17 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Firebase.Auth;
+using Google.Cloud.Firestore;
 
 namespace Mathio.Controllers;
 
 public class ProfileController : Controller
 {
     private FirebaseAuthProvider _auth;
+    private FirestoreDb _db;
 
     public ProfileController()
     {
         _auth = new FirebaseAuthProvider(
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
+        _db = FirestoreDb.Create("pz202122-cf12f");
     }
     // GET
     public IActionResult Index()
@@ -30,8 +33,16 @@ public class ProfileController : Controller
         try
         {
             //create the user
-            await _auth.CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
+            var fbAuth = await _auth.
+                CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
                 true);
+            
+            userModel.ID = fbAuth.User.LocalId;
+            userModel.Type = "user";
+            userModel.Points = 0;
+            CollectionReference usersRef = _db.Collection("Users");
+            await usersRef.Document(userModel.ID).SetAsync(userModel);
+
             TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");
         }
