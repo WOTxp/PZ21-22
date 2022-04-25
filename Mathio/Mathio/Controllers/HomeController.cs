@@ -39,8 +39,6 @@ public class HomeController : Controller
         return null;
     }
 
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
