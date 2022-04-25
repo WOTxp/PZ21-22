@@ -39,15 +39,6 @@ public class HomeController : Controller
         return null;
     }
 
-    public IActionResult Privacy()
-    {
-        var token = HttpContext.Session.GetString("_UserToken");
-        if (token != null)
-        {
-            return View();
-        }
-
-        return RedirectToAction("SignIn", "Profile");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

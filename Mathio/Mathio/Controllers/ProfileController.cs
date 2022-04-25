@@ -2,7 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Firebase.Auth;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using FirebaseAuth = FirebaseAdmin.Auth.FirebaseAuth;
+using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
 using Google.Cloud.Firestore;
+
 
 namespace Mathio.Controllers;
 
@@ -15,6 +20,10 @@ public class ProfileController : Controller
     {
         _auth = new FirebaseAuthProvider(
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
+        if (FirebaseAuth.DefaultInstance==null)
+        {
+            FirebaseApp.Create();
+        }
         _db = FirestoreDb.Create("pz202122-cf12f");
     }
     // GET
@@ -27,6 +36,29 @@ public class ProfileController : Controller
     {
         return View();
     }
+
+    public IActionResult Settings()
+    {
+        string? token = HttpContext.Session.GetString("_UserToken");
+        if (!String.IsNullOrEmpty(token))
+        {
+            try
+            {
+                var user = _auth.GetUserAsync(token).Result;
+                UserModel userModel = new UserModel()
+                {
+                    Email = user.Email,
+                    UserName = user.DisplayName
+                };
+                return View("Settings/Index", userModel);
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("SignIn");
+            }
+        }
+        return RedirectToAction("SignIn");
+    }
     [HttpPost]
     public async Task<IActionResult> Register(UserModel userModel)
     {
@@ -36,7 +68,7 @@ public class ProfileController : Controller
             var fbAuth = await _auth.
                 CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
                 true);
-            
+
             userModel.ID = fbAuth.User.LocalId;
             userModel.Type = "user";
             userModel.Points = 0;
@@ -82,17 +114,16 @@ public class ProfileController : Controller
             if (token != null && fbAuth.User.IsEmailVerified)
             {
                 HttpContext.Session.SetString("_UserToken", token);
-
                 return RedirectToAction("Index");
             }
             else if (!fbAuth.User.IsEmailVerified)
             {
-                ViewBag.Reason = "Login failed: Email Not Verified!";
+                ViewBag.Reason = "Email nie zweryfikowany!";
                 return View();
             }
             else
             {
-                ViewBag.Reason = "Login failed!";
+                ViewBag.Reason = "Nieudane logowanie!";
                 return View();
             }
         }
@@ -113,10 +144,112 @@ public class ProfileController : Controller
             return View();
         }
     }
-
-    public IActionResult LogOut(){
+    [HttpPost]
+    public IActionResult LogOut(string msg="Pomyślnie wylogowano"){
         HttpContext.Session.Remove("_UserToken");
+        TempData["msg"] = msg;
         return RedirectToAction("SignIn");
+    }
+    
+    [Route("Profile/Settings/ChangePassword")]
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePasswordModel data)
+    {
+        Console.WriteLine("Haslo");
+        Console.WriteLine(data.OldPassword);
+        Console.WriteLine("Nowe haslo:");
+        Console.WriteLine(data.NewPassword);
+        if (data.OldPassword == null)
+        {
+            ViewBag.Reason = "Nie podano aktualnego hasła";
+            return Settings();
+        }
+
+        if (data.NewPassword == null)
+        {
+            ViewBag.Reason = "Nie podano nowego hasła";
+            return Settings();
+        }
+        try
+        {
+            string? token = HttpContext.Session.GetString("_UserToken");
+            Console.WriteLine("token:");
+            Console.WriteLine(token);
+            var user = await _auth.GetUserAsync(token);
+            string uid = user.LocalId;
+            Console.Write("UID:");
+            Console.WriteLine(uid);
+            await _auth.SignInWithEmailAndPasswordAsync(user.Email, data.OldPassword);
+            
+            UserRecordArgs args = new UserRecordArgs()
+            {
+                Uid = uid,
+                Password = data.NewPassword,
+            };
+            await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
+            string msg = "Pomyślnie zmieniono hasło. Zaloguj się ponownie";
+            return LogOut(msg);
+
+        }
+        catch (FirebaseAuthException e)
+        {
+            switch (e.Reason)
+            {
+                case AuthErrorReason.WrongPassword:
+                    ViewBag.Reason = "Nieprawidłowe hasło";
+                    break;
+                case AuthErrorReason.MissingPassword:
+                    ViewBag.Reason = "Nie podano aktualnego hasła";
+                    break;
+                default:
+                    ViewBag.Reason = e.Reason;
+                    break;
+            }
+        }
+        catch (ArgumentException)
+        {
+            ViewBag.Reason = "Nowe hasło nie spełnia wymagań bezpieczeństwa";
+        }
+        catch (Exception e)
+        {
+            ViewBag.Reason = e.Message;
+        }
+        
+        
+        return Settings();
+    }
+    [Route("Profile/Settings/UpdateEmail")]
+    [HttpPost]
+    public async Task<IActionResult> UpdateEmail(string email)
+    {
+        Console.WriteLine("Email:");
+        Console.WriteLine(email);
+        string? token = HttpContext.Session.GetString("_UserToken");
+        string uid = _auth.GetUserAsync(token).Result.LocalId;
+        UserRecordArgs args = new UserRecordArgs()
+        {
+            Uid = uid,
+            Email = email,
+        };
+        await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
+        
+        return Settings();
+    }
+    [Route("Profile/Settings/UpdateDisplayName")]
+    [HttpPost]
+    public async Task<IActionResult> UpdateDisplayName(string dName)
+    {
+        Console.WriteLine("DisplayName:");
+        Console.WriteLine(dName);
+        string? token = HttpContext.Session.GetString("_UserToken");
+        string uid = _auth.GetUserAsync(token).Result.LocalId;
+        UserRecordArgs args = new UserRecordArgs()
+        {
+            Uid = uid,
+            DisplayName = dName,
+        };
+        await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
+        return Settings();
     }
     
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
