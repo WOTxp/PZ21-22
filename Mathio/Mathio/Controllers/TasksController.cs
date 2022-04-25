@@ -18,6 +18,7 @@ public class TasksController : Controller
         _db = FirestoreDb.Create("pz202122-cf12f");
         classes = new List<string>
         {
+            "Klasa 1",
             "Test1",
             "Test2",
             "Test3"
@@ -60,16 +61,12 @@ public class TasksController : Controller
         int batchSize = 2;
         int currentnum = 0;
 
-        Dictionary<string,List<TasksModel>> tasksBatchAll = new Dictionary<string, List<TasksModel>>();
+        List<TasksModel> tasksBatchAll = new List<TasksModel>();
         while(_currentCategory < classes.Count && currentnum < batchSize)
         {
-            string category = _currentCategory == _lastDocCategory ? "NoCategory" : classes[_currentCategory];
-            tasksBatchAll.TryAdd(category, new List<TasksModel>());
-            
             List<TasksModel> tasksBatch = await  GetTasksCategoryBatch(classes[_currentCategory], batchSize - currentnum);
             currentnum += tasksBatch.Count;
-            
-            tasksBatchAll[category].AddRange(tasksBatch);
+            tasksBatchAll.AddRange(tasksBatch);
             if (currentnum < batchSize)
             {
                 _currentCategory += 1;
