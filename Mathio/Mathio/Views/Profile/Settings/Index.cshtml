@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Profile Settings";
+}
+
+<style>
+body{
+    background-color: #EEEEEE;
+}
+
+.content{
+    margin: auto;
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-top: 25px;
+    min-width: 375px;
+}
+
+.field-extra{
+    margin-top: 20px;
+    border-radius: 25px;
+    border: 1px solid #BBB;
+    width: 100%;
+    text-align: center;
+}
+
+.submit-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.submit-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #FFFFFF;
+    color: #222222;
+    border: 2px #E0E0E0 solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra:hover{
+    background-color: #F0F0F0;
+    color: #222222;
+    border: 2px #CCCCCC solid;
+    text-shadow: 0 0 0.5px #888888;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.hide{
+    display: none;
+}
+</style>
+
+<div class="row">
+
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
+        <div class="content">
+            <partial name="Settings/_UpdateProfile" model="Model"/>
+            <partial name="Settings/_ChangePassword" model="null"/>
+        </div>
+    </div>
+
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

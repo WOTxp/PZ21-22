@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - Mathio</title>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <!--<link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>-->
     <link rel="stylesheet" href="~/Mathio.styles.css" asp-append-version="true"/>
 
@@ -26,17 +26,6 @@
             
             <li>
                 <a href="/Profile/Index">Home</a>
-            </li>
-            <li>
-                <a href="#userSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profil</a>
-                    <ul class="collapse list-unstyled" id="userSubmenu">
-                        <li>
-                            <a href="/Profile">Mój profil</a>
-                        </li>
-                        <li>
-                            <a href="/Profile/Settings/Index">Ustawienia</a>
-                        </li>
-                    </ul>
             </li>
             <li>
                 <a href="#teoriaSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Teoria</a>
@@ -84,7 +73,10 @@
 
         <ul class="list-unstyled CTAs">
             <li>
-                <a href="/Profile/Index" class="login">Wyloguj</a>
+                <a href="/Profile/SignIn" class="login">Logowanie</a>
+            </li>
+            <li>
+                <a href="/Profile/Register" class="register">Rejestracja</a>
             </li>
         </ul>
 

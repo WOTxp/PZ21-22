@@ -2,7 +2,288 @@
     ViewData["Title"] = "My Profile";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+body{
+    background-color: #EEEEEE;
+}
+
+.content{
+    margin: auto;
+    margin-top: 30px;
+    background-color: #FFFFFF;
+    text-align: center;
+    min-width: 450px;
+}
+
+#photo{
+    margin: auto;
+}
+
+.profile-pictrue{
+    
+}
+
+#data-table{
+    margin: auto;
+    width: 80%;
+}
+
+#username{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #3A8CFF;
+    color: #FFFFFF;
+    margin: auto;
+    width: 100%;
+}
+
+#statistics{
+    margin: auto;
+}
+
+.field-1{
+    text-align: center;
+    font-weight: bold;
+    background-color: #3A8CFF;
+    color: #FFFFFF;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.data-field-1{
+    color: #555;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    font-style: italic;
+    background-color: #F3F3F3;
+    font-weight: bold;
+}
+
+.field-2{
+    text-align: center;
+    font-weight: bold;
+    background-color: #3486F8;
+    color: #FFFFFF;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.data-field-2{
+    color: #555;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    font-style: italic;
+    background-color: #E8E8E8;
+    font-weight: bold;
+}
+
+.box
+{
+  background:#fff;
+  width: 33%;
+  height: 250px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  flex-direction:column;
+  transition: transform .2s;
+  float: left;
+}
+
+.box .percent
+{
+  width: 150px;
+  height: 150px;
+  position:relative;
+}
+.box .percent svg
+{
+  width: 150px;
+  height: 150px;
+  position:relative;
+}
+.box .percent svg circle
+{
+  width:150px;
+  height:150px;
+  fill:none;
+  stroke-width:10;
+  stroke:#000;
+  transform:translate(5px,5px);
+  stroke-dasharray:440;
+  stroke-dashoffset:440;
+  stroke-linecap:round;
+  margin: auto;
+}
+.box .value1 svg circle:nth-child(1)
+{
+  stroke-dashoffset:0;
+  stroke:#f3f3f3;
+}
+.box .value1 svg circle:nth-child(2)
+{
+  stroke-dashoffset:calc(600 - (600 * 75) / 100);
+  stroke:#03a9f4;
+}
+.box .value2 svg circle:nth-child(1)
+{
+  stroke-dashoffset:0;
+  stroke:#f3f3f3;
+}
+.box .value2 svg circle:nth-child(2)
+{
+  stroke-dashoffset:calc(600 - (600 * 48) / 100);
+  stroke:#03a9f4;
+}
+.box .value3 svg circle:nth-child(1)
+{
+  stroke-dashoffset:0;
+  stroke:#f3f3f3;
+}
+.box .value3 svg circle:nth-child(2)
+{
+  stroke-dashoffset:calc(600 - (600 * 54) / 100);
+  stroke:#03a9f4;
+}
+.box .percent .num
+{
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:absolute;
+  color:#111;
+}
+.box .percent .num h2
+{
+  font-size: 37px;
+}
+.box .percent .num h2 span
+{
+  font-size:24px;
+}
+.box .text
+{
+  padding 10px 0 0;
+  color:#999;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+#button-div-settings{
+    margin-top: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #3A8CFF;
+    text-align: center;
+    cursor: pointer;
+    color: #FFFFFF;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+#button-div-settings:hover{
+    background-color: #3082F4;
+    color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.normal-link{
+    text-decoration: none;
+    color: #FFFFFF;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.normal-link:hover{
+    text-decoration: none;
+    color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+</style>
+
+<div class="row">
+
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
+        <div class="content">
+            <div id="photo">
+                <img class="profile-picture img-fluid" src="~/img/profilowe.jpg"/>
+            </div>
+            <div id="username">
+                <h2>ProjektNaPięć</h2>
+            </div>
+            <div id="statistics">
+                <div class="box">
+                    <div class="percent value1">
+                        <svg>
+                            <circle cx="70" cy="70" r="60"></circle>
+                            <circle cx="70" cy="70" r="60"></circle>
+                        </svg>
+                        <div class="num">
+                            <h2>76<span>%</span></h2>
+                        </div>
+                    </div>
+                    <h2 class="text">Teoria</h2>
+                </div>
+                <div class="box">
+                    <div class="percent value2">
+                        <svg>
+                            <circle cx="70" cy="70" r="60"></circle>
+                            <circle cx="70" cy="70" r="60"></circle>
+                        </svg>
+                        <div class="num">
+                            <h2>37<span>%</span></h2>
+                        </div>
+                    </div>
+                    <h2 class="text">Testy</h2>
+                </div>
+                <div class="box">
+                    <div class="percent value3">
+                        <svg>
+                            <circle cx="70" cy="70" r="60"></circle>
+                            <circle cx="70" cy="70" r="60"></circle>
+                        </svg>
+                        <div class="num">
+                            <h2>44<span>%</span></h2>
+                        </div>
+                    </div>
+                    <h2 class="text">Quizy</h2>
+                </div>
+            </div>
+            <div id="data">
+                <table id="data-table">
+                   <tr><td class="field-1">Imię</td><td class="data-field-1">Damian</td></tr>
+                   <tr><td class="field-2">Nazwisko</td><td class="data-field-2">Abramek</td></tr>
+                    <tr><td class="field-1">E-mail</td><td class="data-field-1">Damian3333344@gmail.com</td></tr>
+                   <tr><td class="field-2">Opis</td><td class="data-field-2">Pasjonuję się wszystkim! szczególnie lubię robić różnego rodzaju projekty :)</td></tr>
+                </table>
+            </div>
+            <a href="/Profile/Settings/Index" class="normal-link">
+                <div id="button-div-settings">
+                    <h4>Zmień</h4>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
 </div>
