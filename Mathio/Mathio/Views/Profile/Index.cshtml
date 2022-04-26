@@ -41,7 +41,7 @@ body{
     margin: auto;
 }
 
-.field{
+.field-1{
     text-align: center;
     font-weight: bold;
     background-color: #3A8CFF;
@@ -52,7 +52,7 @@ body{
     padding-right: 10px;
 }
 
-.data-field{
+.data-field-1{
     color: #555;
     padding-left: 10px;
     padding-right: 10px;
@@ -61,6 +61,29 @@ body{
     text-align: left;
     font-style: italic;
     background-color: #F3F3F3;
+    font-weight: bold;
+}
+
+.field-2{
+    text-align: center;
+    font-weight: bold;
+    background-color: #3486F8;
+    color: #FFFFFF;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.data-field-2{
+    color: #555;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    font-style: italic;
+    background-color: #E8E8E8;
     font-weight: bold;
 }
 
@@ -169,21 +192,29 @@ body{
     text-align: center;
     cursor: pointer;
     color: #FFFFFF;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
 }
 
 #button-div-settings:hover{
-    background-color: #3689FB;
+    background-color: #3082F4;
     color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
 }
 
 .normal-link{
     text-decoration: none;
     color: #FFFFFF;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
 }
 
 .normal-link:hover{
     text-decoration: none;
     color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
 }
 </style>
 
@@ -239,10 +270,10 @@ body{
             </div>
             <div id="data">
                 <table id="data-table">
-                   <tr><td class="field">Imię</td><td class="data-field">Damian</td></tr>
-                   <tr><td class="field">Nazwisko</td><td class="data-field">Abramek</td></tr>
-                    <tr><td class="field">E-mail</td><td class="data-field">Damian3333344@gmail.com</td></tr>
-                   <tr><td class="field">Opis</td><td class="data-field">Pasjonuję się wszystkim! szczególnie lubię robić różnego rodzaju projekty :)</td></tr>
+                   <tr><td class="field-1">Imię</td><td class="data-field-1">Damian</td></tr>
+                   <tr><td class="field-2">Nazwisko</td><td class="data-field-2">Abramek</td></tr>
+                    <tr><td class="field-1">E-mail</td><td class="data-field-1">Damian3333344@gmail.com</td></tr>
+                   <tr><td class="field-2">Opis</td><td class="data-field-2">Pasjonuję się wszystkim! szczególnie lubię robić różnego rodzaju projekty :)</td></tr>
                 </table>
             </div>
             <a href="/Profile/Settings/Index" class="normal-link">
