@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Google.Cloud.Firestore;
 
 namespace Mathio.Models;

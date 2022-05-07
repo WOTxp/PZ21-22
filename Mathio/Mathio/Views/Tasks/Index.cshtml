@@ -53,9 +53,11 @@ body{
 <script type="text/javascript" defer>
     $("#load").on("click", function () {
     $.ajax({
-        url: '@Url.Action("LoadMoreTasks", "Tasks")',
+        type: "GET",
+        url: '@Url.Action("LoadMoreTasks", "Tasks", new { batchSize=2 })',
         success: function (response) {
-            $("#tasks").append(response);
+            alert(response)
+            document.getElementById("tasks").innerHTML+=response;
         }
     });
 });
