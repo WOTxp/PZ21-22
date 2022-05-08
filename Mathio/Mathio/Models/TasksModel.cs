@@ -21,6 +21,6 @@ public class TasksModel
     public string Category { get; set; }
     public override string ToString()
     {
-        return String.Format("ID: {0}\nAuthor: {1}\nTitle: {2}\nDescription: {3}\n",ID,Author.ToString(),Title,Description);
+        return String.Format("Category: {0}\nTitle: {1}\nDescription: {2}\n",Category,Title,Description);
     }
 }

@@ -51,7 +51,7 @@ body{
 </div>
 
 <script type="text/javascript" defer>
-    $("#load").on("click", function () {
+$("#load").on("click", function () {
     $.ajax({
         type: "GET",
         url: '@Url.Action("LoadMoreTasks", "Tasks", new { batchSize=2 })',

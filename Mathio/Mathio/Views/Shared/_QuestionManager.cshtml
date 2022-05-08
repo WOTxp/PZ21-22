@@ -1,0 +1,19 @@
+﻿@model QuestionModel
+
+<div class="question">
+    <div class="form-group text-center field-group-extra">
+        <label class="control-label hide" for="Questions[@Model.Number]_Type">Typ</label>
+        <input class="form-control field-extra valid" placeholder="Typ" type="text" data-val="true" data-val-required="The Type field is required." id="Questions[@Model.Number]_Type" name="Questions[@Model.Number].Type" value=" " aria-invalid="false">
+        <span class="text-danger field-validation-valid" data-valmsg-for="Questions[@Model.Number].Type" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label class="control-label hide" for="Questions[@Model.Number]_Question">Question</label>
+        <input class="form-control field-extra" placeholder="Pytanie" type="text" data-val="true" data-val-required="The Question field is required." id="Questions[@Model.Number]_Question" name="Questions[@Model.Number].Question" value="">
+        <span class="text-danger field-validation-valid" data-valmsg-for="Questions[@Model.Number].Question" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label class="control-label hide" for="Questions[@Model.Number]_CorrectAnswer">CorrectAnswer</label>
+        <input class="form-control field-extra valid" placeholder="Poprawna Odpowiedź" type="text" data-val="true" data-val-required="The CorrectAnswer field is required." id="Questions[@Model.Number]_CorrectAnswer" name="Questions[@Model.Number].CorrectAnswer" value=" " aria-invalid="false">
+        <span class="text-danger field-validation-valid" data-valmsg-for="Questions[@Model.Number].CorrectAnswer" data-valmsg-replace="true"></span>
+    </div>
+</div>

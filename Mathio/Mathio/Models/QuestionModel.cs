@@ -10,6 +10,9 @@ public class QuestionModel
     public string ID { get; set; }
     [Required]
     [FirestoreProperty]
+    public int Number { get; set; }
+    [Required]
+    [FirestoreProperty]
     public string Question { get; set; }
     [Required]
     [FirestoreProperty]
@@ -19,4 +22,8 @@ public class QuestionModel
     [Required]
     [FirestoreProperty]
     public string CorrectAnswer { get; set; }
+    public override string ToString()
+    {
+        return String.Format("{0}\nQuestion: {1}\n",Number,Question);
+    }
 }
