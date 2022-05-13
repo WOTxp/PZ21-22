@@ -24,19 +24,17 @@
     </div>
     <h4>Lessons</h4>
     <div id="lessons">
-        @Html.EditorFor(m => m.Lessons)
+        <partial name="TasksManager/_LessonsList" model="Model"/>
     </div>
     <button id="addLesson" type="button">Add Lesson</button>
     <h4>Questions</h4>
     <div id="questions">
-        @Html.EditorFor(m=>m.Questions)
+        <partial name="TasksManager/_LessonsList" model="Model"/>
+        @Html.EditorFor(m => m.Questions)
     </div>
     <button id="addQuestion" type="button">Add Question</button>
     <input type="submit" value="Dodaj" class="btn btn-primary submit-extra"/>
 </form>
-<div id="test">
-    
-</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 

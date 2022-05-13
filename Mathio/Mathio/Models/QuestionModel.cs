@@ -7,7 +7,7 @@ namespace Mathio.Models;
 public class QuestionModel
 {
     [FirestoreDocumentId]
-    public string ID { get; set; }
+    public string? ID { get; set; }
     [Required]
     [FirestoreProperty]
     public int Number { get; set; }
@@ -18,10 +18,11 @@ public class QuestionModel
     [FirestoreProperty]
     public string Type { get; set; }
     [FirestoreProperty]
-    public List<string> Answers { get; set; }
+    public List<string>? Answers { get; set; }
     [Required]
     [FirestoreProperty]
     public string CorrectAnswer { get; set; }
+    
     public override string ToString()
     {
         return String.Format("{0}\nQuestion: {1}\n",Number,Question);

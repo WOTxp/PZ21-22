@@ -7,7 +7,7 @@ namespace Mathio.Models;
 public class LessonModel
 {
     [FirestoreDocumentId]
-    public string ID { get; set; }
+    public string? ID { get; set; }
     [Required]
     [FirestoreProperty]
     public int Page { get; set; }

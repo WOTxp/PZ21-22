@@ -1,0 +1,15 @@
+﻿@model Mathio.Models.LessonModel
+
+<div class="lesson">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Page" class="control-label hide"></label>
+        <input asp-for="Page" class="form-control field-extra" placeholder="Strona"/>
+        <span asp-validation-for="Page" class="text-danger"></span>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Content" class="control-label hide"></label>
+        <input asp-for="Content" class="form-control field-extra" placeholder="Zawartość"/>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+</div>

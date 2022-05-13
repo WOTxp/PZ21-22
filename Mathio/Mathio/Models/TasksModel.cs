@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Google.Cloud.Firestore;
 
 namespace Mathio.Models;
@@ -8,10 +7,9 @@ namespace Mathio.Models;
 public class TasksModel
 {
     [FirestoreDocumentId]
-    public string ID { get; set; }
-    [Required]
+    public string? ID { get; set; }
     [FirestoreProperty]
-    public DocumentReference Author { get; set; }
+    public DocumentReference? Author { get; set; }
     [Required]
     [FirestoreProperty]
     public string Title { get; set; }

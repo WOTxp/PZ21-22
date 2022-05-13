@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Google.Cloud.Firestore;
+using Newtonsoft.Json;
 
 
 namespace Mathio.Controllers;
@@ -24,43 +25,45 @@ public class TasksManager : Controller
     {
         return View();
     }
+
+    public IActionResult EditTask(string id)
+    {
+        TasksModel t = _db.Collection("Tasks").Document(path: id).GetSnapshotAsync().Result.ConvertTo<TasksModel>();
+        TasksAllModel tall = new TasksAllModel
+        {
+            Task = t
+        };
+        Console.WriteLine(t.Title+" "+t.ID);
+        return View(tall);
+    }
     
     [HttpPost]
-    public IActionResult AddTask(TasksAllModel t)
+    public IActionResult AddTask([Bind("Task, Lessons, Questions")] TasksAllModel newTask)
     {
-        Console.WriteLine(t.Task);
-        foreach (var lesson in t.Lessons)
+        if (ModelState.IsValid)
         {
-            Console.WriteLine(lesson);
+            return RedirectToAction("Index");
         }
-        foreach (var question in t.Questions)
-        {
-            Console.WriteLine(question);
-        }
-        return View();
+        Console.WriteLine(ModelState.ErrorCount);
+        return View(newTask);
     }
-
-    public IActionResult GetLessonManagerPartial(int page)
+    
+    
+    [HttpPost]
+    public IActionResult AddLesson([Bind("Task, Lessons, Questions")] TasksAllModel m)
     {
-        Console.WriteLine(page);
-        LessonModel lesson = new LessonModel
-        {
-            Page = page,
-            Content = " ",
-        };
-        return PartialView("_LessonManager", lesson);
+        m.Lessons.Add(new LessonModel());
+        Console.WriteLine(m.Lessons.Count);
+        return PartialView("TasksManager/_LessonsList", m);
     }
-    public IActionResult GetQuestionManagerPartial(int nr)
+    [HttpPost]
+    public IActionResult AddQuestion([Bind("Questions")] TasksAllModel m)
     {
-        Console.WriteLine(nr);
-        QuestionModel question = new QuestionModel
-        {
-            Number = nr,
-            Type = " ",
-            CorrectAnswer = " ",
-        };
-        return PartialView("_QuestionManager", question);
+        m.Questions.Add(new QuestionModel());
+        Console.WriteLine(m.Questions.Count);
+        return PartialView("TasksManager/_QuestionsList", m);
     }
+    
     
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
