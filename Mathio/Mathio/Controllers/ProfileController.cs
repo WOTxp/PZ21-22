@@ -54,9 +54,12 @@ public class ProfileController : Controller
             }
             catch (Exception)
             {
+                TempData["returnUrl"] = "Settings";
                 return RedirectToAction("SignIn");
             }
         }
+
+        TempData["returnUrl"] = "Settings";
         return RedirectToAction("SignIn");
     }
     [HttpPost]
@@ -101,7 +104,7 @@ public class ProfileController : Controller
         return View();
     }
     [HttpPost]
-    public async Task<IActionResult> SignIn(UserModel userModel)
+    public async Task<IActionResult> SignIn(UserModel userModel, string? returnUrl)
     {
         try
         {
@@ -114,15 +117,20 @@ public class ProfileController : Controller
             if (token != null && fbAuth.User.IsEmailVerified)
             {
                 HttpContext.Session.SetString("_UserToken", token);
+                if (!String.IsNullOrEmpty(returnUrl))
+                    return RedirectToAction(returnUrl);
+                
                 return RedirectToAction("Index");
             }
             else if (!fbAuth.User.IsEmailVerified)
             {
+                TempData["returnUrl"] = returnUrl;
                 ViewBag.Reason = "Email nie zweryfikowany!";
                 return View();
             }
             else
             {
+                TempData["returnUrl"] = returnUrl;
                 ViewBag.Reason = "Nieudane logowanie!";
                 return View();
             }
@@ -141,6 +149,7 @@ public class ProfileController : Controller
                     ViewBag.Reason = e.Reason;
                     break;
             }
+            TempData["returnUrl"] = returnUrl;
             return View();
         }
     }
