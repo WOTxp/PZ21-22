@@ -15,6 +15,7 @@ public class LessonModel
     [FirestoreProperty]
     public string Content { get; set; }
     
+    public bool Deleted = false;
     public override string ToString()
     {
         return String.Format("{0}\nContent: {1}\n",Page,Content);

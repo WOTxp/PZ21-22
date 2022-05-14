@@ -22,6 +22,8 @@ public class QuestionModel
     [Required]
     [FirestoreProperty]
     public string CorrectAnswer { get; set; }
+
+    public bool Deleted = false;
     
     public override string ToString()
     {
