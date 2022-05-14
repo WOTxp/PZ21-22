@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Firebase.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Google.Cloud.Firestore;
@@ -11,6 +10,7 @@ public class TasksController : Controller
 {
     private FirestoreDb _db;
     private static DocumentSnapshot? _lastDoc;
+    private static TasksModel? _lastTask;
 
     public TasksController()
     {
@@ -46,13 +46,32 @@ public class TasksController : Controller
         return tasks;
     }
 
+    public IActionResult Lessons(string id, int page=1)
+    {
+        DocumentReference t = _db.Collection("Tasks").Document(id);
+        TasksModel task = new TasksModel();
+        if (_lastTask != null && _lastTask.ID == id)
+        {
+            task = _lastTask;
+        }
+        else
+        {
+            task = t.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
+        }
+        LessonModel lesson = _db.Collection("Tasks").Document(id).Collection("Lessons").WhereEqualTo("Page", page)
+            .GetSnapshotAsync().Result.Documents[0].ConvertTo<LessonModel>();
+        return View(new Tuple<TasksModel,LessonModel>(task,lesson));
+    }
+
     public async Task<IActionResult> LoadMoreTasks(int batchSize = 2)
     {
         List<TasksModel> tasksBatchAll = await GetTasksCategoryBatch(batchSize);
         List<Tuple<TasksModel, UserModel>> tasks = new List<Tuple<TasksModel, UserModel>>();
         foreach (TasksModel task in tasksBatchAll)
         {
-            UserModel author = task.Author.GetSnapshotAsync().Result.ConvertTo<UserModel>();
+            UserModel author = new UserModel();
+            if(task.Author != null)
+                author = task.Author.GetSnapshotAsync().Result.ConvertTo<UserModel>();
             tasks.Add(new Tuple<TasksModel, UserModel>(task, author));
         }
 
