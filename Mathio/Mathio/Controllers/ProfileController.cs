@@ -29,7 +29,28 @@ public class ProfileController : Controller
     // GET
     public IActionResult Index()
     {
-        return View();
+        string? token = HttpContext.Session.GetString("_UserToken");
+        if (!String.IsNullOrEmpty(token))
+        {
+            try
+            {
+                var user = _auth.GetUserAsync(token).Result;
+                UserModel userModel = new UserModel()
+                {
+                    Email = user.Email,
+                    UserName = user.DisplayName
+                };
+                return View(userModel);
+            }
+            catch (Exception)
+            {
+                TempData["returnUrl"] = "Index";
+                return RedirectToAction("SignIn");
+            }
+        }
+
+        TempData["returnUrl"] = "Index";
+        return RedirectToAction("SignIn");
     }
 
     public IActionResult Register()
