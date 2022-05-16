@@ -1,16 +1,23 @@
 ﻿@model Mathio.Models.LessonModel
 
-<div class="lesson">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="ID" hidden/>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Page" class="control-label hide"></label>
-        <input asp-for="Page" class="form-control field-extra" placeholder="Strona"/>
-        <span asp-validation-for="Page" class="text-danger"></span>
-    </div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Content" class="control-label hide"></label>
-        <input asp-for="Content" class="form-control field-extra" placeholder="Zawartość"/>
-        <span asp-validation-for="Content" class="text-danger"></span>
+<div class="catcher  col-sm-6 margin-top-20">
+    <div class="title"><h4>Lekcja</h4></div>
+    <div class="block-of-content">
+        <div class="lesson">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="ID" hidden/>
+            <div class="form-group text-center field-group-extra">
+                <h5>Strona</h5>
+                <label asp-for="Page" class="control-label hide display-none"></label>
+                <input asp-for="Page" class="form-control field-extra" placeholder="Strona"/>
+                <span asp-validation-for="Page" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center field-group-extra">
+                <h5 class="margin-top-10">Zawartość</h5>
+                <label asp-for="Content" class="control-label hide display-none"></label>
+                <input asp-for="Content" class="form-control field-extra" placeholder="Zawartość"/>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 </div>

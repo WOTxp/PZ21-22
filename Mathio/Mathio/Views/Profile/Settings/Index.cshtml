@@ -14,8 +14,7 @@ body{
     padding-right: 30px;
     padding-top: 20px;
     padding-bottom: 20px;
-    margin-top: 25px;
-    min-width: 375px;
+    widht: 100%;
 }
 
 .field-extra{
@@ -71,6 +70,51 @@ body{
 .hide{
     display: none;
 }
+
+.title{
+    background-color: #088AFC;
+    padding: 14px;
+    color: #FFFFFF;
+    text-align: center;
+    width: 100%;
+    font-size: 24px
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.catcher{
+    width: 100%;
+    min-width: 375px;
+}
+
+#extra:hover{
+    background-color: #3082F4;
+    color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.a:link{
+    text-decoration: none;
+    color: #FFFFFF;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.a:link:hover{
+    text-decoration: none;
+    color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+a:link{
+    text-decoration: none;
+}
 </style>
 
 <div class="row">
@@ -78,9 +122,13 @@ body{
     <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
 
     <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
-        <div class="content">
-            <partial name="Settings/_UpdateProfile" model="Model"/>
-            <partial name="Settings/_ChangePassword" model="null"/>
+        <div class="catcher margin-top-20">
+            <div class="title">Ustawienia</div>
+            <div class="content">
+                <partial name="Settings/_UpdateProfile" model="Model"/>
+                <partial name="Settings/_ChangePassword" model="null"/>
+            </div>
+            <a href="/Profile" class="link"><div class="title extra cursor-pointer">Ucieczka</div></a>
         </div>
     </div>
 
