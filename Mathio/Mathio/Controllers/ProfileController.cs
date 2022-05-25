@@ -16,55 +16,50 @@ public class ProfileController : Controller
     {
         _auth = new FirebaseAuthProvider(
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
-        /*if (FirebaseAuth.DefaultInstance==null)
-        {
-            FirebaseApp.Create();
-        }*/
-        
+
         _db = FirestoreDb.Create("pz202122-cf12f");
     }
-    // GET
-    public IActionResult Index()
+    //GET: /Profile
+    [HttpGet]
+    public async Task<IActionResult> Index()
     {
-        return View();
-    }
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", routeValues: new {returnUrl = "/Profile"});
+        }
 
+        try
+        {
+            var user = await _auth.GetUserAsync(token);
+            return View(user);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            return RedirectToAction("SignIn", routeValues: new {returnUrl = "/Profile"});
+        }
+    }
+    //GET: /Profile/Register
     public IActionResult Register()
     {
         return View();
     }
-    [Route("Profile/Settings")]
-    public IActionResult Settings()
-    {
-        string? token = HttpContext.Session.GetString("_UserToken");
-        if (!String.IsNullOrEmpty(token))
-        {
-            try
-            {
-                var user = _auth.GetUserAsync(token).Result;
-                UserModel userModel = new UserModel()
-                {
-                    Email = user.Email,
-                    UserName = user.DisplayName
-                };
-                return View("Settings/Index", userModel);
-            }
-            catch (Exception)
-            {
-                return RedirectToAction("SignIn");
-            }
-        }
-        return RedirectToAction("SignIn");
-    }
+    //POST: /Profile/Register
     [HttpPost]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
+        if (!ModelState.IsValid) return View();
         try
         {
             //create the user
             var fbAuth = await _auth.
                 CreateUserWithEmailAndPasswordAsync(model.Email, model.Password, model.UserName,
-                true);
+                    true);
             
             /*userModel.ID = fbAuth.User.LocalId;
             userModel.Type = "user";
@@ -92,14 +87,21 @@ public class ProfileController : Controller
             return View();
         }
     }
-    
-    public IActionResult SignIn()
+    //GET: /Profile/SignIn
+    public IActionResult SignIn(string? returnUrl)
     {
+        if (string.IsNullOrEmpty(returnUrl))
+        {
+            return View();
+        }
+        ViewBag.ReturnUrl = returnUrl;
         return View();
     }
+    //POST: /Profile/SignIn
     [HttpPost]
     public async Task<IActionResult> SignIn(SignInViewModel model)
     {
+        if (!ModelState.IsValid) return View();
         try
         {
             //log in the new user
@@ -115,7 +117,7 @@ public class ProfileController : Controller
             }
             else if (!fbAuth.User.IsEmailVerified)
             {
-                ViewBag.Reason = "Email nie zweryfikowany!";
+                ModelState.AddModelError("Email", "Email nie zweryfikowany!");
                 return View();
             }
             else
@@ -129,10 +131,10 @@ public class ProfileController : Controller
             switch (e.Reason)
             {
                 case AuthErrorReason.WrongPassword:
-                    ViewBag.Reason = "Nieprawidłowe hasło";
+                    ModelState.AddModelError("Password", "Nieprawidłowe hasło");
                     break;
                 case AuthErrorReason.UnknownEmailAddress:
-                    ViewBag.Reason = "Nieznany adres e-mail";
+                    ModelState.AddModelError("Email", "Nieznany adres e-mail");
                     break;
                 default:
                     ViewBag.Reason = e.Reason;
@@ -141,11 +143,36 @@ public class ProfileController : Controller
             return View();
         }
     }
+    //GET: /Profile/LogOut
     [HttpGet]
-    public IActionResult LogOut(string msg="Pomyślnie wylogowano"){
+    public IActionResult LogOut(){
         HttpContext.Session.Remove("_UserToken");
-        TempData["msg"] = msg;
+        TempData["msg"] = "Pomyślnie wylogowano";
         return RedirectToAction("SignIn");
+    }
+    //GET: /Profile/Settings
+    [Route("Profile/Settings")]
+    public IActionResult Settings()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", routeValues:new{returnUrl="/Profile/Settings"});
+        }
+        try
+        {
+            var user = _auth.GetUserAsync(token).Result;
+            return View("Settings/Index", user);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            return RedirectToAction("SignIn", routeValues:new{returnUrl="/Profile/Settings"});
+        }
     }
     //GET: /Profile/Settings/ChangePassword
     [Route("Profile/Settings/ChangePassword")]
@@ -168,12 +195,10 @@ public class ProfileController : Controller
         {
             if (e.Reason == AuthErrorReason.InvalidIDToken)
             {
-                TempData["msg"] = "Nieprawidłowy token uwierzytelniania! Zaloguj się aby zmienić hasło";
-                return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby zmienić hasło";
             }
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
         }
-        
-        return RedirectToAction("SignIn");
     }
     //POST: /Profile/Settings/ChangePassword
     [Route("Profile/Settings/ChangePassword")]
@@ -212,7 +237,7 @@ public class ProfileController : Controller
                     ModelState.AddModelError("NewPassword", "Hasło nie spełnia wymagań bezpieczeństwa");
                     break;
                 case AuthErrorReason.InvalidIDToken:
-                    TempData["msg"] = "Nieprawidłowy token uwierzytelniania! Zaloguj się aby zmienić hasło";
+                    TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby zmienić hasło";
                     return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
                 default:
                     ViewBag.Reason = e.Reason;
