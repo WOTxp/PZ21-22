@@ -161,7 +161,7 @@ public class ProfileController : Controller
         
         try
         {
-            var user = await _auth.GetUserAsync(token);
+            await _auth.GetUserAsync(token);
             return View("Settings/ChangePassword");
         }
         catch (FirebaseAuthException e)
@@ -233,14 +233,6 @@ public class ProfileController : Controller
         Console.WriteLine("Email:");
         Console.WriteLine(email);
         string? token = HttpContext.Session.GetString("_UserToken");
-        string uid = _auth.GetUserAsync(token).Result.LocalId;
-        /*UserRecordArgs args = new UserRecordArgs()
-        {
-            Uid = uid,
-            Email = email,
-        };*/
-        //await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
-        
         return Settings();
     }
     [Route("Profile/Settings/UpdateDisplayName")]
@@ -250,19 +242,12 @@ public class ProfileController : Controller
         Console.WriteLine("DisplayName:");
         Console.WriteLine(dName);
         string? token = HttpContext.Session.GetString("_UserToken");
-        string uid = _auth.GetUserAsync(token).Result.LocalId;
-        /*UserRecordArgs args = new UserRecordArgs()
-        {
-            Uid = uid,
-            DisplayName = dName,
-        };*/
-        //await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
         return Settings();
     }
     
-    /*[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
-    }*/
+    }
 }
