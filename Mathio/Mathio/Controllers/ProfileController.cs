@@ -1,13 +1,9 @@
 ﻿using System.Diagnostics;
+using Firebase.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
-using Firebase.Auth;
-using FirebaseAdmin;
-using FirebaseAdmin.Auth;
-using FirebaseAuth = FirebaseAdmin.Auth.FirebaseAuth;
-using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
 using Google.Cloud.Firestore;
-
+using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
 
 namespace Mathio.Controllers;
 
@@ -20,10 +16,11 @@ public class ProfileController : Controller
     {
         _auth = new FirebaseAuthProvider(
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
-        if (FirebaseAuth.DefaultInstance==null)
+        /*if (FirebaseAuth.DefaultInstance==null)
         {
             FirebaseApp.Create();
-        }
+        }*/
+        
         _db = FirestoreDb.Create("pz202122-cf12f");
     }
     // GET
@@ -36,7 +33,7 @@ public class ProfileController : Controller
     {
         return View();
     }
-
+    [Route("Profile/Settings")]
     public IActionResult Settings()
     {
         string? token = HttpContext.Session.GetString("_UserToken");
@@ -146,50 +143,59 @@ public class ProfileController : Controller
     }
     [HttpGet]
     public IActionResult LogOut(string msg="Pomyślnie wylogowano"){
-        Console.WriteLine("Logout");
         HttpContext.Session.Remove("_UserToken");
         TempData["msg"] = msg;
         return RedirectToAction("SignIn");
     }
-    
+    //GET: /Profile/Settings/ChangePassword
+    [Route("Profile/Settings/ChangePassword")]
+    [HttpGet]
+    public async Task<IActionResult> ChangePassword()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby zmienić hasło";
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
+        }
+        
+        try
+        {
+            var user = await _auth.GetUserAsync(token);
+            return View("Settings/ChangePassword");
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniania! Zaloguj się aby zmienić hasło";
+                return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
+            }
+        }
+        
+        return RedirectToAction("SignIn");
+    }
+    //POST: /Profile/Settings/ChangePassword
     [Route("Profile/Settings/ChangePassword")]
     [HttpPost]
     public async Task<IActionResult> ChangePassword(ChangePasswordModel data)
     {
-        Console.WriteLine("Hasło");
-        Console.WriteLine(data.OldPassword);
-        Console.WriteLine("Nowe hasło:");
-        Console.WriteLine(data.NewPassword);
-        if (data.OldPassword == null)
-        {
-            ViewBag.Reason = "Nie podano aktualnego hasła";
-            return Settings();
-        }
-
-        if (data.NewPassword == null)
-        {
-            ViewBag.Reason = "Nie podano nowego hasła";
-            return Settings();
-        }
+        if (!ModelState.IsValid) return View("Settings/ChangePassword");
         try
         {
-            string? token = HttpContext.Session.GetString("_UserToken");
-            Console.WriteLine("token:");
-            Console.WriteLine(token);
-            var user = await _auth.GetUserAsync(token);
-            string uid = user.LocalId;
-            Console.Write("UID:");
-            Console.WriteLine(uid);
-            await _auth.SignInWithEmailAndPasswordAsync(user.Email, data.OldPassword);
-            
-            UserRecordArgs args = new UserRecordArgs()
+            var token = HttpContext.Session.GetString("_UserToken");
+            if (string.IsNullOrEmpty(token))
             {
-                Uid = uid,
-                Password = data.NewPassword,
-            };
-            await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
-            string msg = "Pomyślnie zmieniono hasło. Zaloguj się ponownie";
-            return LogOut(msg);
+                TempData["msg"] = "Zaloguj się aby zmienić hasło";
+                return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
+            }
+            var loggedUser = await  _auth.GetUserAsync(token);
+            var authLink = await _auth.SignInWithEmailAndPasswordAsync(loggedUser.Email, data.OldPassword);
+            HttpContext.Session.SetString("_UserToken", authLink.FirebaseToken);
+            authLink = await _auth.ChangeUserPassword(token, data.NewPassword);
+            HttpContext.Session.SetString("_UserToken", authLink.FirebaseToken);
+            ViewBag.Success = "Pomyślnie zmieniono hasło.";
+            return View("Settings/ChangePassword");
 
         }
         catch (FirebaseAuthException e)
@@ -197,27 +203,28 @@ public class ProfileController : Controller
             switch (e.Reason)
             {
                 case AuthErrorReason.WrongPassword:
-                    ViewBag.Reason = "Nieprawidłowe hasło";
+                    ModelState.AddModelError("OldPassword", "Nieprawidłowe hasło");
                     break;
                 case AuthErrorReason.MissingPassword:
-                    ViewBag.Reason = "Nie podano aktualnego hasła";
+                    ModelState.AddModelError("OldPassword", "Nie podano aktualnego hasła");
                     break;
+                case AuthErrorReason.WeakPassword:
+                    ModelState.AddModelError("NewPassword", "Hasło nie spełnia wymagań bezpieczeństwa");
+                    break;
+                case AuthErrorReason.InvalidIDToken:
+                    TempData["msg"] = "Nieprawidłowy token uwierzytelniania! Zaloguj się aby zmienić hasło";
+                    return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
                 default:
                     ViewBag.Reason = e.Reason;
                     break;
             }
-        }
-        catch (ArgumentException)
-        {
-            ViewBag.Reason = "Nowe hasło nie spełnia wymagań bezpieczeństwa";
         }
         catch (Exception e)
         {
             ViewBag.Reason = e.Message;
         }
         
-        
-        return Settings();
+        return View("Settings/ChangePassword");
     }
     [Route("Profile/Settings/UpdateEmail")]
     [HttpPost]
@@ -227,12 +234,12 @@ public class ProfileController : Controller
         Console.WriteLine(email);
         string? token = HttpContext.Session.GetString("_UserToken");
         string uid = _auth.GetUserAsync(token).Result.LocalId;
-        UserRecordArgs args = new UserRecordArgs()
+        /*UserRecordArgs args = new UserRecordArgs()
         {
             Uid = uid,
             Email = email,
-        };
-        await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
+        };*/
+        //await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
         
         return Settings();
     }
@@ -244,18 +251,18 @@ public class ProfileController : Controller
         Console.WriteLine(dName);
         string? token = HttpContext.Session.GetString("_UserToken");
         string uid = _auth.GetUserAsync(token).Result.LocalId;
-        UserRecordArgs args = new UserRecordArgs()
+        /*UserRecordArgs args = new UserRecordArgs()
         {
             Uid = uid,
             DisplayName = dName,
-        };
-        await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
+        };*/
+        //await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
         return Settings();
     }
     
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    /*[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
-    }
+    }*/
 }
