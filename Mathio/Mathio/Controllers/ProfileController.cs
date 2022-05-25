@@ -13,8 +13,8 @@ namespace Mathio.Controllers;
 
 public class ProfileController : Controller
 {
-    private FirebaseAuthProvider _auth;
-    private FirestoreDb _db;
+    private readonly FirebaseAuthProvider _auth;
+    private readonly FirestoreDb _db;
 
     public ProfileController()
     {
@@ -60,20 +60,20 @@ public class ProfileController : Controller
         return RedirectToAction("SignIn");
     }
     [HttpPost]
-    public async Task<IActionResult> Register(UserModel userModel)
+    public async Task<IActionResult> Register(RegisterViewModel model)
     {
         try
         {
             //create the user
             var fbAuth = await _auth.
-                CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
+                CreateUserWithEmailAndPasswordAsync(model.Email, model.Password, model.UserName,
                 true);
-
-            userModel.ID = fbAuth.User.LocalId;
+            
+            /*userModel.ID = fbAuth.User.LocalId;
             userModel.Type = "user";
             userModel.Points = 0;
             CollectionReference usersRef = _db.Collection("Users");
-            await usersRef.Document(userModel.ID).SetAsync(userModel);
+            await usersRef.Document(userModel.ID).SetAsync(userModel);*/
 
             TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");
@@ -82,10 +82,10 @@ public class ProfileController : Controller
             switch (e.Reason)
             {
                 case AuthErrorReason.EmailExists:
-                    ViewBag.Reason = "Konto z tym adresem e-mail już istnieje";
+                    ModelState.AddModelError("Email", "Konto z tym adresem e-mail już istnieje"); 
                     break;
                 case AuthErrorReason.WeakPassword:
-                    ViewBag.Reason = "Hasło nie spełnia wymagań bezpieczeństwa";
+                    ModelState.AddModelError("Password", "Hasło nie spełnia wymagań bezpieczeństwa");
                     break;
                 default:
                     ViewBag.Reason = e.Reason;
@@ -101,15 +101,15 @@ public class ProfileController : Controller
         return View();
     }
     [HttpPost]
-    public async Task<IActionResult> SignIn(UserModel userModel)
+    public async Task<IActionResult> SignIn(SignInViewModel model)
     {
         try
         {
             //log in the new user
             var fbAuth = await _auth
-                .SignInWithEmailAndPasswordAsync(userModel.Email, userModel.Password);
+                .SignInWithEmailAndPasswordAsync(model.Email, model.Password);
             await fbAuth.RefreshUserDetails();
-            string token = fbAuth.FirebaseToken;
+            var token = fbAuth.FirebaseToken;
             //saving the token in a session variable
             if (token != null && fbAuth.User.IsEmailVerified)
             {
@@ -123,7 +123,7 @@ public class ProfileController : Controller
             }
             else
             {
-                ViewBag.Reason = "Nieudane logowanie!";
+                ViewBag.Reason = "Błąd logowania!";
                 return View();
             }
         }
@@ -144,8 +144,9 @@ public class ProfileController : Controller
             return View();
         }
     }
-    [HttpPost]
+    [HttpGet]
     public IActionResult LogOut(string msg="Pomyślnie wylogowano"){
+        Console.WriteLine("Logout");
         HttpContext.Session.Remove("_UserToken");
         TempData["msg"] = msg;
         return RedirectToAction("SignIn");
@@ -155,9 +156,9 @@ public class ProfileController : Controller
     [HttpPost]
     public async Task<IActionResult> ChangePassword(ChangePasswordModel data)
     {
-        Console.WriteLine("Haslo");
+        Console.WriteLine("Hasło");
         Console.WriteLine(data.OldPassword);
-        Console.WriteLine("Nowe haslo:");
+        Console.WriteLine("Nowe hasło:");
         Console.WriteLine(data.NewPassword);
         if (data.OldPassword == null)
         {

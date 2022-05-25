@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Google.Cloud.Firestore;
 
 
@@ -9,19 +8,18 @@ namespace Mathio.Models;
 public class UserModel
 {
     [FirestoreDocumentId]
-    public string ID { get; set; }
-    public string UserName { get; set; }
+    public string? Id { get; set; }
+    public string? UserName { get; set; }
     [Required]
     [EmailAddress]
-    public string Email { get; set; }
-    [Required]
-    public string Password { get; set; }
-    
+    public string? Email { get; set; }
     [FirestoreProperty]
-    public string Type { get; set; }
+    public string? Type { get; set; }
     [FirestoreProperty]
     public int Points { get; set; }
-
-
     
+    public ICollection<TasksModel>? FinishedTasks { get; set; }
+
+
+
 }
