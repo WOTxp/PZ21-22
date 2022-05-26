@@ -24,21 +24,6 @@ public class HomeController : Controller
     {
         return View();
     }
-    
-    //for future use (may be deleted)
-    public UserModel? GetUserFromToken(string token)
-    {
-        var user = _auth.GetUserAsync(token).Result;
-        if(user != null)
-        {
-            UserModel? u = new UserModel();
-            u.Email = user.Email;
-            u.UserName = user.DisplayName;
-            return u;
-        }
-        return null;
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

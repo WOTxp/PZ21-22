@@ -1,4 +1,4 @@
-﻿@model Mathio.Models.UserModel
+﻿@model Mathio.Models.SignInViewModel
 
 @{
     ViewData["Title"] = "SignIn";
@@ -102,7 +102,7 @@ body{
     <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
         <div class="content">
             <div class="main-name">Logowanie</div>
-            <form asp-action="SignIn">
+            <form asp-action="SignIn" asp-route-returnUrl="@ViewBag.ReturnUrl">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group text-center field-group-extra">
                     <label asp-for="Email" class="control-label hide"></label>
