@@ -4,6 +4,7 @@
 }
 
 <div>
+    <div id="success">@TempData["success"]</div>
     <button id="load" class="btn-dark">Załaduj</button>
     <div id="tasks" class="row"></div>
 </div>
@@ -18,16 +19,5 @@ $("#load").on("click", function () {
             document.getElementById("tasks").innerHTML+=response;
         }
     });
-});
-$("edit").on("click", function () {
-    $.ajax({
-            type: "GET",
-            url: '@Url.Action("EditTask", "TasksManager")',
-            data: $("ID").serialize(),
-            success: function (response) {
-                alert(response)
-                document.getElementById("tasks").innerHTML+=response;
-            }
-        });
 });
 </script>

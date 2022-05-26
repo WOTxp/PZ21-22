@@ -57,19 +57,49 @@ public class TasksManager : Controller
         return View(newTask);
     }
     
-    public async Task<IActionResult> DeleteTask(string id="")
+    public async Task<IActionResult> DeleteTask(string id)
     {
-        if (id == "")
+        if (!ModelState.IsValid)
             return RedirectToAction("Index", "TasksManager");
         DocumentReference task = _db.Collection("Tasks").Document(path: id);
         TasksModel t = task.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
         return View(t);
     }
     
+    private async Task DeleteCollection(CollectionReference collectionReference, int batchSize){
+        QuerySnapshot snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
+        IReadOnlyList<DocumentSnapshot> documents = snapshot.Documents;
+        while (documents.Count > 0)
+        {
+            foreach (DocumentSnapshot document in documents)
+            {
+                await document.Reference.DeleteAsync();
+            }
+            snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
+            documents = snapshot.Documents;
+        }
+    }
     [HttpDelete]
-    public async Task<IActionResult> DeleteTaskAll(string id = "")
+    public async Task<IActionResult> DeleteTaskAll(string id)
     {
-        return RedirectToAction("Index", "TasksManager");
+        Console.WriteLine(id);
+        DocumentReference task = _db.Collection("Tasks").Document(path: id);
+        var collections =  task.ListCollectionsAsync().GetAsyncEnumerator();
+        try
+        {
+            while (await collections.MoveNextAsync())
+            {
+                await DeleteCollection(collections.Current, 32);
+            }
+        }
+        finally
+        {
+            await collections.DisposeAsync();
+        }
+
+        await task.DeleteAsync();
+        TempData["success"] = "Pomyślnie usunieto!";
+        return Json(new {success = true, data=id});
     }
     
     public async Task<IActionResult> EditTask(string id="")

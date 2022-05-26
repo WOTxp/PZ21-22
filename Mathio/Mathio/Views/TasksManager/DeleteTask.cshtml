@@ -5,8 +5,24 @@
 }
 
 <div>
-    <h1>Czy na pewno chcesz usunąć</h1>
-    <partial name="TasksManager/_TaskM" model="Model"/>
+    <h1>Czy na pewno chcesz usunąć?</h1>
+    <partial name="TasksManager/_TaskMC" model="Model"/>
     <button id="confirm">Potwierdź</button>
-    <button id="cancel">Anuluj</button>
+    <button id="cancel" onclick="location.href='@Url.Action("Index", "TasksManager")'">Anuluj</button>
 </div>
+
+<script type="text/javascript" defer>
+$("#confirm").on("click", function () {
+    $.ajax({
+        type: "DELETE",
+        url: '@Url.Action("DeleteTaskAll", "TasksManager", new {id=Model.ID})',
+        success: function (response) {
+            alert(JSON.stringify(response));
+            if(response["success"]){
+                alert("UDALO SIE!");
+                location.replace("@Url.Action("Index", "TasksManager")");
+            }
+        }
+    });
+});
+</script>
