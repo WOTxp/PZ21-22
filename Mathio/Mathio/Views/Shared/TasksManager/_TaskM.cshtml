@@ -1,0 +1,22 @@
+﻿@model Mathio.Models.TasksModel
+
+<div class="col-sm-12 col-lg-6 col-xxl-4 d-flex">
+    <div class="one-category">
+        <div class="category">
+            <h2>@Model.Category</h2>
+        </div>
+        <div class="title-and-description">
+            <div class="title">
+                <h3>@Model.Title</h3>
+            </div>
+        
+            <hr>
+
+            <div class="description">
+                <p>@Model.Description</p>
+            </div>
+        </div>
+    </div>
+    <button id="edit" class="btn-info" onclick="location.href='@Url.Action("EditTask", "TasksManager", new {id = Model.ID})'">Edit</button>
+    <button id="delete" class="btn-danger">Delete</button>
+</div>

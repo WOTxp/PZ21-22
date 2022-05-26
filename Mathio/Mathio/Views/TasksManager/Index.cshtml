@@ -4,5 +4,30 @@
 }
 
 <div>
-    Strona menadżera testów.
+    <button id="load" class="btn-dark">Załaduj</button>
+    <div id="tasks" class="row"></div>
 </div>
+
+<script type="text/javascript" defer>
+$("#load").on("click", function () {
+    $.ajax({
+        type: "GET",
+        url: '@Url.Action("LoadMoreTasksM", "TasksManager", new { batchSize=2 })',
+        success: function (response) {
+            alert(response)
+            document.getElementById("tasks").innerHTML+=response;
+        }
+    });
+});
+$("edit").on("click", function () {
+    $.ajax({
+            type: "GET",
+            url: '@Url.Action("EditTask", "TasksManager")',
+            data: $("ID").serialize(),
+            success: function (response) {
+                alert(response)
+                document.getElementById("tasks").innerHTML+=response;
+            }
+        });
+});
+</script>

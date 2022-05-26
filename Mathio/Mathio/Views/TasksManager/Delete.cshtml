@@ -1,0 +1,12 @@
+﻿@model TasksModel
+
+@{
+    Layout = "_Layout";
+}
+
+<div>
+    <h1>Czy na pewno chcesz usunąć</h1>
+    <partial name="TasksManager/_TaskM" model="Model"/>
+    <button id="confirm">Potwierdź</button>
+    <button id="cancel">Anuluj</button>
+</div>
