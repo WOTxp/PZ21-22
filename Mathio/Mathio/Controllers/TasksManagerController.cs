@@ -57,7 +57,7 @@ public class TasksManager : Controller
         return View(newTask);
     }
     
-    public async Task<IActionResult> Delete(string id="")
+    public async Task<IActionResult> DeleteTask(string id="")
     {
         if (id == "")
             return RedirectToAction("Index", "TasksManager");
@@ -67,7 +67,7 @@ public class TasksManager : Controller
     }
     
     [HttpDelete]
-    public async Task<IActionResult> Delete(string id = "")
+    public async Task<IActionResult> DeleteTaskAll(string id = "")
     {
         return RedirectToAction("Index", "TasksManager");
     }
