@@ -6,9 +6,10 @@ public class RegisterViewModel
 {
     [Required]
     [EmailAddress]
-    public string? Email { get; set; }
+    public string? Email { get; init; }
     [Required]
     public string? Password { get; init; }
     [Required]
-    public string? UserName { get; set; }
+    [RegularExpression("\\w*", ErrorMessage = "Dozwolone są tylko litery, cyfry i znak _")]
+    public string? UserName { get; init; }
 }

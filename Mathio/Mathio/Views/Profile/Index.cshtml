@@ -1,4 +1,4 @@
-﻿@model Firebase.Auth.User
+﻿@model UserModel
 @{
     ViewData["Title"] = "My Profile";
 }
@@ -229,7 +229,7 @@ body{
                 <img class="profile-picture img-fluid" src="~/img/profilowe.jpg"/>
             </div>
             <div id="username">
-                <h2>@Model.DisplayName</h2>
+                <h2>@Model.UserName</h2>
             </div>
             <div id="statistics">
                 <div class="box">
@@ -274,7 +274,7 @@ body{
                    <tr><td class="field-1">Imię</td><td class="data-field-1">@Model.FirstName</td></tr>
                    <tr><td class="field-2">Nazwisko</td><td class="data-field-2">@Model.LastName</td></tr>
                     <tr><td class="field-1">E-mail</td><td class="data-field-1">@Model.Email</td></tr>
-                   <tr><td class="field-2">Opis</td><td class="data-field-2">Pasjonuję się wszystkim! szczególnie lubię robić różnego rodzaju projekty :)</td></tr>
+                   <tr><td class="field-2">Opis</td><td class="data-field-2">@Model.Description</td></tr>
                 </table>
             </div>
             <a href="/Profile/Settings/Index" class="normal-link">

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model UserModel
+@{
     ViewData["Title"] = "Profile Settings";
 }
 
@@ -79,7 +80,35 @@ body{
 
     <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
         <div class="content">
-            <partial name="Settings/_UpdateProfile" model="Model"/>
+            <form method="post">
+                <label asp-for="UserName"></label>
+                <input class="form-control field-extra" asp-for="UserName" type="text"/>
+                <span class="text-danger" asp-validation-for="UserName"></span>
+                <button type="submit" class="btn btn-primary" asp-action="UpdateDisplayName" asp-controller="Profile">Zmień nazwę użytkownika</button>
+                <br/>
+            </form>
+            <form method="post">
+                <label asp-for="FirstName"></label>
+                <input class="form-control field-extra" asp-for="FirstName" type="text"/>
+                <span class="text-danger" asp-validation-for="FirstName"></span>
+                <button type="submit" class="btn btn-primary" asp-action="UpdateFirstName" asp-controller="Profile">Zmień imię</button>
+                <br/>
+            </form>
+            <form method="post">
+                <label asp-for="LastName"></label>
+                <input class="form-control field-extra" asp-for="LastName" type="text"/>
+                <span class="text-danger" asp-validation-for="LastName"></span>
+                <button type="submit" class="btn btn-primary" asp-action="UpdateLastName" asp-controller="Profile">Zmień nazwisko</button>
+                <br/>
+            </form>
+            <form method="post">
+                <label asp-for="Description"></label>
+                <input class="form-control field-extra" asp-for="Description" type="text"/>
+                <span class="text-danger" asp-validation-for="Description"></span>
+                <button type="submit" class="btn btn-primary" asp-action="UpdateDescription" asp-controller="Profile">Zmień opis</button>
+                <br/>
+            </form>
+
         </div>
     </div>
 
