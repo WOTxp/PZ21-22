@@ -58,9 +58,18 @@ public class TasksController : Controller
         {
             task = t.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
         }
-        LessonModel lesson = _db.Collection("Tasks").Document(id).Collection("Lessons").WhereEqualTo("Page", page)
-            .GetSnapshotAsync().Result.Documents[0].ConvertTo<LessonModel>();
-        return View(new Tuple<TasksModel,LessonModel>(task,lesson));
+
+        var lessonDoc = _db.Collection("Tasks").Document(id).Collection("Lessons").WhereEqualTo("Page", page)
+            .GetSnapshotAsync().Result.Documents;
+        Console.WriteLine(lessonDoc.Count);
+        if (lessonDoc.Count > 0)
+        {
+            var lesson = lessonDoc[0].ConvertTo<LessonModel>();
+            return View(new Tuple<TasksModel,LessonModel>(task,lesson));
+        }
+
+        return RedirectToAction("Index", "Tasks");
+
     }
 
     public async Task<IActionResult> LoadMoreTasks(int batchSize = 2)
