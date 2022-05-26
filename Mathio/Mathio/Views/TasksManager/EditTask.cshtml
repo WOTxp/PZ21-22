@@ -1,0 +1,66 @@
+﻿@model Mathio.Models.TasksAllModel
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>Edit Task</h2>
+<form asp-action="EditTask" id="taskForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Task.ID" hidden/>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Task.Category" class="control-label hide"></label>
+        <input asp-for="Task.Category" class="form-control field-extra" placeholder="Kategoria"/>
+        <span asp-validation-for="Task.Category" class="text-danger"></span>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Task.Title" class="control-label hide"></label>
+        <input asp-for="Task.Title" class="form-control field-extra" placeholder="Tytuł"/>
+        <span asp-validation-for="Task.Title" class="text-danger"></span>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Task.Description" class="control-label hide"></label>
+        <input asp-for="Task.Description" class="form-control field-extra" placeholder="Opis"/>
+        <span asp-validation-for="Task.Description" class="text-danger"></span>
+    </div>
+    <h4>Lessons</h4>
+    <div id="lessons">
+        @Html.EditorFor(m => m.Lessons)
+    </div>
+    <button id="addLesson" type="button">Add Lesson</button>
+    <h4>Questions</h4>
+    <div id="questions">
+        @Html.EditorFor(m => m.Questions)
+    </div>
+    <button id="addQuestion" type="button">Add Question</button>
+    <input type="submit" value="Dodaj" class="btn btn-primary submit-extra"/>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $("#addLesson").on("click", function () {
+            $.ajax({
+                type: "POST",
+                data: $("#taskForm").serialize(),
+                url: '@Url.Action("AddLesson", "TasksManager")',
+                success: function (response) {
+                    alert(response);
+                    $("#lessons").html(response);
+                }
+            });
+        });
+        
+        $("#addQuestion").on("click", function () {
+            $.ajax({
+                type: "POST",
+                data: $("#taskForm").serialize(),
+                url: '@Url.Action("AddQuestion", "TasksManager")',
+                success: function (response) {
+                    alert(response)
+                    $("#questions").html(response);
+                }
+            });
+        });
+    </script>
+}

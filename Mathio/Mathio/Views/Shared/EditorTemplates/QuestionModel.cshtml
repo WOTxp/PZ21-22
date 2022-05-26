@@ -1,0 +1,51 @@
+﻿@model Mathio.Models.QuestionModel
+
+<div class="question" xmlns="http://www.w3.org/1999/html">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="ID" hidden/>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Type" class="control-label hide"></label>
+        <select asp-for="Type" class="form-control field-extra">
+            <option>Otwarte</option>
+            <option>Zamknięte</option>
+        </select>
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Number" class="control-label hide"></label>
+        <input asp-for="Number" class="form-control field-extra" placeholder="Zawartość"/>
+        <span asp-validation-for="Number" class="text-danger"></span>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="Question" class="control-label hide"></label>
+        <input asp-for="Question" class="form-control field-extra" placeholder="Zawartość"/>
+        <span asp-validation-for="Question" class="text-danger"></span>
+    </div>
+    <div id="answers" class="m-4">
+        <div class="form-group text-center field-group-extra">
+            <label asp-for="Answers[0]" class="control-label hide"></label>
+            <input asp-for="Answers[0]" class="form-control field-extra" placeholder="Zawartość"/>
+            <span asp-validation-for="Answers[0]" class="text-danger"></span>
+        </div>
+        <div class="form-group text-center field-group-extra">
+            <label asp-for="Answers[1]" class="control-label hide"></label>
+            <input asp-for="Answers[1]" class="form-control field-extra" placeholder="Zawartość"/>
+            <span asp-validation-for="Answers[1]" class="text-danger"></span>
+        </div>
+        <div class="form-group text-center field-group-extra">
+            <label asp-for="Answers[2]" class="control-label hide"></label>
+            <input asp-for="Answers[2]" class="form-control field-extra" placeholder="Zawartość"/>
+            <span asp-validation-for="Answers[2]" class="text-danger"></span>
+        </div>
+        <div class="form-group text-center field-group-extra">
+            <label asp-for="Answers[3]" class="control-label hide"></label>
+            <input asp-for="Answers[3]" class="form-control field-extra" placeholder="Zawartość"/>
+            <span asp-validation-for="Answers[3]" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group text-center field-group-extra">
+        <label asp-for="CorrectAnswer" class="control-label hide"></label>
+        <input asp-for="CorrectAnswer" class="form-control field-extra" placeholder="Zawartość"/>
+        <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+    </div>
+</div>
