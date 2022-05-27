@@ -15,7 +15,7 @@
 $("#confirm").on("click", function () {
     $.ajax({
         type: "DELETE",
-        url: '@Url.Action("DeleteTaskAll", "TasksManager", new {id=Model.ID})',
+        url: '@Url.Action("DeleteTaskAll", "TasksManager", new {id=Model.Id})',
         success: function (response) {
             alert(JSON.stringify(response));
             if(response["success"]){

@@ -282,21 +282,21 @@ body{
                     <h4>Zmień</h4>
                 </div>
             </a>
-            <div id="finishedTasks" class="onlyToPrint deleteLater">
+            <div id="TasksStatus" class="onlyToPrint deleteLater">
                 @{
-                    if (@Model.FinishedTasks == null || @Model.FinishedTasks.Count == 0)
+                    if (@Model.TasksStatus == null || @Model.TasksStatus.Count == 0)
                     {
-                        <h4>No finished tasks</h4>
+                        <h4>No opened tasks</h4>
                     }
                     else
                     {
-                        foreach (var finishedTask in @Model.FinishedTasks)
+                        foreach (var taskStatus in @Model.TasksStatus)
                         {
     
                             <p>
-                                Task: @finishedTask.Task?.Title, Category: @finishedTask.Task?.Category<br/>
-                                Author: (@finishedTask.Task?.Author?.Type) @finishedTask.Task?.Author?.UserName<br/>
-                                Wynik: @finishedTask.Score, Data zakończenia: @finishedTask.Date.ToDateTime()
+                                Task: @taskStatus.Task?.Title, Category: @taskStatus.Task?.Category<br/>
+                                Author: (@taskStatus.Task?.Author?.Type) @taskStatus.Task?.Author?.UserName<br/>
+                                Wynik: @taskStatus.TestScore/@taskStatus.Task?.QuestionsPerTask, Teoria: @taskStatus.CurrentPage/@taskStatus.Task?.NumPages
                             </p>
                         }
                     }

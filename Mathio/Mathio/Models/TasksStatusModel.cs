@@ -4,7 +4,7 @@ using Google.Cloud.Firestore;
 namespace Mathio.Models;
 
 [FirestoreData]
-public class TasksFinModel
+public class TasksStatusModel
 {
     [FirestoreDocumentId]
     public string? Id { get; set; }
@@ -12,9 +12,9 @@ public class TasksFinModel
     [FirestoreProperty]
     public DocumentReference? TaskReference { get; set; }
     [FirestoreProperty]
-    public int Score { get; set; }
+    public int TestScore { get; set; }
     [FirestoreProperty]
-    public Timestamp Date { get; set; }
+    public int CurrentPage { get; set; }
     public TasksModel? Task { get; set; }
 
     public async Task<TasksModel?> DownloadTask()

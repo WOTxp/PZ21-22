@@ -50,7 +50,7 @@ public class TasksController : Controller
     {
         DocumentReference t = _db.Collection("Tasks").Document(id);
         TasksModel task = new TasksModel();
-        if (_lastTask != null && _lastTask.ID == id)
+        if (_lastTask != null && _lastTask.Id == id)
         {
             task = _lastTask;
         }

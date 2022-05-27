@@ -39,12 +39,12 @@ public class ProfileController : Controller
             userModel.Email = user.Email;
 
             //Add finished tasks
-            await userModel.DownloadFinishedTasks(_db);
-            if (userModel.FinishedTasks == null) 
+            await userModel.DownloadTasksStatus();
+            if (userModel.TasksStatus == null) 
                 return View(userModel);
-            foreach (var finishedTask in userModel.FinishedTasks)
+            foreach (var taskStatus in userModel.TasksStatus)
             {
-                var task = await finishedTask.DownloadTask();
+                var task = await taskStatus.DownloadTask();
                 if (task != null)
                 {
                     await task.DownloadAuthor();
@@ -76,16 +76,16 @@ public class ProfileController : Controller
             //create the user
             var fbAuth = await _auth.
                 CreateUserWithEmailAndPasswordAsync(model.Email, model.Password, sendVerificationEmail:true);
+            var usersRef = _db.Collection("Users");
             var user = new UserModel
             {
-                Id = fbAuth.User.LocalId,
+                Self = null,
                 Type = "user",
                 UserName = model.UserName,
                 Points = 0
             };
             
-            var usersRef = _db.Collection("Users");
-            await usersRef.Document(user.Id).SetAsync(user);
+            await usersRef.Document(fbAuth.User.LocalId).SetAsync(user);
 
             TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");

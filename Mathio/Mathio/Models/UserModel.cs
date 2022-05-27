@@ -9,7 +9,7 @@ namespace Mathio.Models;
 public class UserModel
 {
     [FirestoreDocumentId]
-    public string? Id { get; set; }
+    public DocumentReference? Self { get; set; }
     [FirestoreProperty]
     [Required]
     [RegularExpression("\\w*", ErrorMessage = "Dozwolone tylko litery, cyfry i znak _")]
@@ -29,17 +29,20 @@ public class UserModel
     [DisplayName("Opis")]
     public string? Description { get; set; }
     public string? Email { get; set; }
-    public ICollection<TasksFinModel>? FinishedTasks { get; set; }
+    public ICollection<TasksStatusModel>? TasksStatus { get; set; }
 
-    public async Task DownloadFinishedTasks(FirestoreDb db)
+    public async Task DownloadTasksStatus()
     {
-        FinishedTasks = new List<TasksFinModel>();
-        var finishedTasksQuery = 
-            await db.Collection("Users").Document(Id).Collection("FinishedTasks").GetSnapshotAsync();
-        foreach (var document in finishedTasksQuery)
+        TasksStatus = new List<TasksStatusModel>();
+        if (Self != null)
         {
-            var finishedTask = document.ConvertTo<TasksFinModel>();
-            FinishedTasks.Add(finishedTask);
+            var finishedTasksQuery =
+                await Self.Collection("TasksStatus").GetSnapshotAsync();
+            foreach (var document in finishedTasksQuery)
+            {
+                var finishedTask = document.ConvertTo<TasksStatusModel>();
+                TasksStatus.Add(finishedTask);
+            }
         }
     }
 

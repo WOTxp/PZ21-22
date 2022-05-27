@@ -130,7 +130,7 @@ public class TasksManager : Controller
             Lessons = lessons,
             Questions = questions
         };
-        Console.WriteLine(t.Title+" "+t.ID);
+        Console.WriteLine(t.Title+" "+t.Id);
         return View(tall);
     }
 
