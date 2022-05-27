@@ -29,7 +29,19 @@ public class UserModel
     [DisplayName("Opis")]
     public string? Description { get; set; }
     public string? Email { get; set; }
-    public ICollection<TasksModel>? FinishedTasks { get; set; }
+    public ICollection<TasksFinModel>? FinishedTasks { get; set; }
+
+    public async Task DownloadFinishedTasks(FirestoreDb db)
+    {
+        FinishedTasks = new List<TasksFinModel>();
+        var finishedTasksQuery = 
+            await db.Collection("Users").Document(Id).Collection("FinishedTasks").GetSnapshotAsync();
+        foreach (var document in finishedTasksQuery)
+        {
+            var finishedTask = document.ConvertTo<TasksFinModel>();
+            FinishedTasks.Add(finishedTask);
+        }
+    }
 
 
 

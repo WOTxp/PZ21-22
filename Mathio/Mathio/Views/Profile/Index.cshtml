@@ -271,10 +271,10 @@ body{
             </div>
             <div id="data">
                 <table id="data-table">
-                   <tr><td class="field-1">Imię</td><td class="data-field-1">@Model.FirstName</td></tr>
-                   <tr><td class="field-2">Nazwisko</td><td class="data-field-2">@Model.LastName</td></tr>
+                    <tr><td class="field-1">Imię</td><td class="data-field-1">@Model.FirstName</td></tr>
+                    <tr><td class="field-2">Nazwisko</td><td class="data-field-2">@Model.LastName</td></tr>
                     <tr><td class="field-1">E-mail</td><td class="data-field-1">@Model.Email</td></tr>
-                   <tr><td class="field-2">Opis</td><td class="data-field-2">@Model.Description</td></tr>
+                    <tr><td class="field-2">Opis</td><td class="data-field-2">@Model.Description</td></tr>
                 </table>
             </div>
             <a href="/Profile/Settings/Index" class="normal-link">
@@ -282,6 +282,26 @@ body{
                     <h4>Zmień</h4>
                 </div>
             </a>
+            <div id="finishedTasks" class="onlyToPrint deleteLater">
+                @{
+                    if (@Model.FinishedTasks == null || @Model.FinishedTasks.Count == 0)
+                    {
+                        <h4>No finished tasks</h4>
+                    }
+                    else
+                    {
+                        foreach (var finishedTask in @Model.FinishedTasks)
+                        {
+    
+                            <p>
+                                Task: @finishedTask.Task?.Title, Category: @finishedTask.Task?.Category<br/>
+                                Author: (@finishedTask.Task?.Author?.Type) @finishedTask.Task?.Author?.UserName<br/>
+                                Wynik: @finishedTask.Score, Data zakończenia: @finishedTask.Date.ToDateTime()
+                            </p>
+                        }
+                    }
+                }
+            </div>
         </div>
     </div>
 

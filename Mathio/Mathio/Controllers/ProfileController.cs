@@ -33,9 +33,23 @@ public class ProfileController : Controller
         try
         {
             var user = await _auth.GetUserAsync(token);
-            var userDoc = await _db.Collection("Users").Document(user.LocalId).GetSnapshotAsync();
-            var userModel = userDoc.ConvertTo<UserModel>();
+            var userDoc = _db.Collection("Users").Document(user.LocalId);
+            var userSnap = await userDoc.GetSnapshotAsync();
+            var userModel = userSnap.ConvertTo<UserModel>();
             userModel.Email = user.Email;
+
+            //Add finished tasks
+            await userModel.DownloadFinishedTasks(_db);
+            if (userModel.FinishedTasks == null) 
+                return View(userModel);
+            foreach (var finishedTask in userModel.FinishedTasks)
+            {
+                var task = await finishedTask.DownloadTask();
+                if (task != null)
+                {
+                    await task.DownloadAuthor();
+                }
+            }
             return View(userModel);
         }
         catch (FirebaseAuthException e)

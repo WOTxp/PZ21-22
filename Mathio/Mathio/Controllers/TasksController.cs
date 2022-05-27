@@ -79,8 +79,8 @@ public class TasksController : Controller
         foreach (TasksModel task in tasksBatchAll)
         {
             UserModel author = new UserModel();
-            if(task.Author != null)
-                author = task.Author.GetSnapshotAsync().Result.ConvertTo<UserModel>();
+            if(task.AuthorReference != null)
+                author = task.AuthorReference.GetSnapshotAsync().Result.ConvertTo<UserModel>();
             tasks.Add(new Tuple<TasksModel, UserModel>(task, author));
         }
 
