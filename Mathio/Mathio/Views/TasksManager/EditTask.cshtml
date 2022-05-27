@@ -33,7 +33,9 @@
         @Html.EditorFor(m => m.Questions)
     </div>
     <button id="addQuestion" type="button">Add Question</button>
+     <a href="/TasksManager" class="btn btn-primary" role="button">Wróć</a>
     <input type="submit" value="Dodaj" class="btn btn-primary submit-extra"/>
+   
 </form>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
