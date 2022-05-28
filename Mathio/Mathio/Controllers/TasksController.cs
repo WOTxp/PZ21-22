@@ -61,6 +61,8 @@ public class TasksController : Controller
         await _openedTask.GetLesson(page);
         return View(_openedTask);
     }
+    //GET: /Tasks/ID/Questions
+    [Route("Tasks/{id}/Questions")]
     public async Task<IActionResult> Questions(string id, int num = 1)
     {
         if (_testManager ==null || _openedTask?.SelfReference?.Id != id)
