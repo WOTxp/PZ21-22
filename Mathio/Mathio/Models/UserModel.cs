@@ -30,14 +30,14 @@ public class UserModel
     public string? Description { get; set; }
     public string? Email { get; set; }
     public ICollection<TasksStatusModel>? TasksStatus { get; set; }
+    public ICollection<TestHistoryModel>? TestsHistory { get; set; }
 
     public async Task DownloadTasksStatus()
     {
         TasksStatus = new List<TasksStatusModel>();
         if (Self != null)
         {
-            var finishedTasksQuery =
-                await Self.Collection("TasksStatus").GetSnapshotAsync();
+            var finishedTasksQuery = await Self.Collection("TasksStatus").GetSnapshotAsync();
             foreach (var document in finishedTasksQuery)
             {
                 var finishedTask = document.ConvertTo<TasksStatusModel>();
@@ -46,6 +46,17 @@ public class UserModel
         }
     }
 
-
-
+    public async Task DownloadTestsHistory()
+    {
+        TestsHistory = new List<TestHistoryModel>();
+        if (Self != null)
+        {
+            var historyQuery = await Self.Collection("TestsHistory").OrderBy("Date").GetSnapshotAsync();
+            foreach (var document in historyQuery)
+            {
+                var historyTest = document.ConvertTo<TestHistoryModel>();
+                TestsHistory.Add(historyTest);
+            }
+        }
+    }
 }

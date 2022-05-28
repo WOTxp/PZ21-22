@@ -500,6 +500,44 @@ public class ProfileController : Controller
             return Json(new {success = false, errors, data = settings.Description});
         }
     }
+    //GET: /Profile/History
+    public async Task<IActionResult> History()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby zobaczyć swoją historię";
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/History"});
+        }
+        
+        try
+        {
+            var user = await _auth.GetUserAsync(token);
+            var userDoc = await _db.Collection("Users").Document(user.LocalId).GetSnapshotAsync();
+            var userModel = userDoc.ConvertTo<UserModel>();
+            await userModel.DownloadTestsHistory();
+            //Add tests from history
+            if (userModel.TestsHistory == null) 
+                return View(userModel);
+            foreach (var historyTest in userModel.TestsHistory)
+            {
+                var task = await historyTest.DownloadTask();
+                if (task != null)
+                {
+                    await task.DownloadAuthor();
+                }
+            }
+            return View(userModel);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby zobaczyć swoją historię";
+            }
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/History"});
+        }
+    }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
