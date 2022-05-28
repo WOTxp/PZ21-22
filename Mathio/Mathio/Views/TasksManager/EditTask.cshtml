@@ -1,4 +1,4 @@
-﻿@model Mathio.Models.TasksAllModel
+﻿@model Mathio.Models.TasksModel
 @{
     ViewBag.Title = "title";
     Layout = "_Layout";
@@ -7,21 +7,21 @@
 <h2>Edit Task</h2>
 <form asp-action="EditTask" id="taskForm">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="Task.Id" hidden/>
+    <input asp-for="SelfReference" hidden/>
     <div class="form-group text-center field-group-extra">
-        <label asp-for="Task.Category" class="control-label hide"></label>
-        <input asp-for="Task.Category" class="form-control field-extra" placeholder="Kategoria"/>
-        <span asp-validation-for="Task.Category" class="text-danger"></span>
+        <label asp-for="Category" class="control-label hide"></label>
+        <input asp-for="Category" class="form-control field-extra" placeholder="Kategoria"/>
+        <span asp-validation-for="Category" class="text-danger"></span>
     </div>
     <div class="form-group text-center field-group-extra">
-        <label asp-for="Task.Title" class="control-label hide"></label>
-        <input asp-for="Task.Title" class="form-control field-extra" placeholder="Tytuł"/>
-        <span asp-validation-for="Task.Title" class="text-danger"></span>
+        <label asp-for="Title" class="control-label hide"></label>
+        <input asp-for="Title" class="form-control field-extra" placeholder="Tytuł"/>
+        <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     <div class="form-group text-center field-group-extra">
-        <label asp-for="Task.Description" class="control-label hide"></label>
-        <input asp-for="Task.Description" class="form-control field-extra" placeholder="Opis"/>
-        <span asp-validation-for="Task.Description" class="text-danger"></span>
+        <label asp-for="Description" class="control-label hide"></label>
+        <input asp-for="Description" class="form-control field-extra" placeholder="Opis"/>
+        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     <h4>Lessons</h4>
     <div id="lessons">

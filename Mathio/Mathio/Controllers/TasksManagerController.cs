@@ -61,9 +61,9 @@ public class TasksManager : Controller
     {
         if (!ModelState.IsValid)
             return RedirectToAction("Index", "TasksManager");
-        DocumentReference task = _db.Collection("Tasks").Document(path: id);
-        TasksModel t = task.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
-        return View(t);
+        var taskDoc = await _db.Collection("Tasks").Document(path: id).GetSnapshotAsync();
+        var task = taskDoc.ConvertTo<TasksModel>();
+        return View(task);
     }
     
     private async Task DeleteCollection(CollectionReference collectionReference, int batchSize){
@@ -102,40 +102,22 @@ public class TasksManager : Controller
         return Json(new {success = true, data=id});
     }
     
-    public async Task<IActionResult> EditTask(string id="")
+    public async Task<IActionResult> EditTask(string id)
     {
-        if (id == "")
+        if(!ModelState.IsValid)
             return RedirectToAction("Index", "TasksManager");
         
-        DocumentReference task = _db.Collection("Tasks").Document(path: id);
-        TasksModel t = task.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
-        
-        List<LessonModel> lessons = new List<LessonModel>(); 
-        QuerySnapshot snap_lessons = await task.Collection("Lessons").GetSnapshotAsync();
-        foreach (DocumentSnapshot l in snap_lessons.Documents)
-        {
-            lessons.Add(l.ConvertTo<LessonModel>());
-        }
+        var taskDoc = await _db.Collection("Tasks").Document(path: id).GetSnapshotAsync();
+        var task = taskDoc.ConvertTo<TasksModel>();
 
-        List<QuestionModel> questions = new List<QuestionModel>();
-        QuerySnapshot snap_questions = await task.Collection("Questions").GetSnapshotAsync();
-        foreach (DocumentSnapshot q in snap_questions.Documents)
-        {
-            questions.Add(q.ConvertTo<QuestionModel>());
-        }
+        await task.DownloadAllLessons();
+        await task.DownloadAllQuestions();
         
-        TasksAllModel tall = new TasksAllModel
-        {
-            Task = t,
-            Lessons = lessons,
-            Questions = questions
-        };
-        Console.WriteLine(t.Title+" "+t.Id);
-        return View(tall);
+        return View(task);
     }
 
     [HttpPost]
-    public async Task<IActionResult> EditTask(TasksAllModel task)
+    public async Task<IActionResult> EditTask(TasksModel task)
     {
         if (ModelState.IsValid)
         {
@@ -145,15 +127,17 @@ public class TasksManager : Controller
     }
 
     [HttpPost]
-    public IActionResult AddLesson([Bind("Lessons")] TasksAllModel m)
+    public IActionResult AddLesson([Bind("Lessons")] TasksModel m)
     {
+        m.Lessons ??= new List<LessonModel>();
         m.Lessons.Add(new LessonModel());
         Console.WriteLine(m.Lessons.Count);
         return PartialView("TasksManager/_LessonsList", m);
     }
     [HttpPost]
-    public IActionResult AddQuestion([Bind("Questions")] TasksAllModel m)
+    public IActionResult AddQuestion([Bind("Questions")] TasksModel m)
     {
+        m.Questions ??= new List<QuestionModel>();
         m.Questions.Add(new QuestionModel());
         Console.WriteLine(m.Questions.Count);
         return PartialView("TasksManager/_QuestionsList", m);

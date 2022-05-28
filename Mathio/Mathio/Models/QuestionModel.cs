@@ -22,9 +22,14 @@ public class QuestionModel
     [Required]
     [FirestoreProperty]
     public string CorrectAnswer { get; set; }
-
     public bool Deleted = false;
     
+    public QuestionAnswerModel AnswerModel { get; set; }
+
+    public QuestionModel()
+    {
+        AnswerModel = new QuestionAnswerModel();
+    }
     public override string ToString()
     {
         return String.Format("{0}\nQuestion: {1}\n",Number,Question);

@@ -1,19 +1,26 @@
-﻿@model Tuple<Mathio.Models.TasksModel, Mathio.Models.UserModel>
+﻿@model Mathio.Models.TasksModel
 
-<div class="col-sm-12 col-lg-6 col-xxl-4 d-flex">
+<div class="col-sm-12 col-lg-6 col-xxl-4 d-flex" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id=Model.SelfReference?.Id})'">
     <div class="one-category">
         <div class="category">
-            <h2>@Model.Item1.Category</h2>
+            <h2>@Model.Category</h2>
         </div>
         <div class="title-and-description">
             <div class="title">
-                <h3>@Model.Item1.Title</h3>
+                <h3>@Model.Title</h3>
             </div>
         
             <hr>
 
             <div class="description">
-                <p>@Model.Item1.Description</p>
+                <p>@Model.Description</p>
+            </div>
+            <div class="Author">
+                <div>@Model.Author?.UserName</div>
+                <div>@Model.Author?.Points</div>
+            </div>
+            <div>
+                @Model.CreatedAt?.ToDateTime()
             </div>
         </div>
     </div>

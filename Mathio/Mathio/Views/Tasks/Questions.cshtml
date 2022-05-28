@@ -1,0 +1,18 @@
+﻿@model TestManager
+
+@{
+    Layout = "_Layout";
+}
+
+<div>
+    @Model.Task.Category
+    @Model.Task.Title
+    @Model.Task.Description
+    @Model.Task.Author?.UserName
+    @Model.Task.Author?.Points
+    @Model.Task.CreatedAt
+    
+    @{
+        await Html.RenderPartialAsync("_Question", model: Model.currentQuestion);
+    }
+</div>

@@ -1,4 +1,4 @@
-﻿@model Tuple<TasksModel, LessonModel>
+﻿@model Mathio.Models.TasksModel
 
 @{
     Layout = "_Layout";
@@ -6,14 +6,39 @@
 
 
 <div id="Task">
-    @Model.Item1.Category
-    @Model.Item1.Title
-    @Model.Item1.Description
+    @Model.Category
+    @Model.Title
+    @Model.Description
+    @Model.Author?.UserName
+    @Model.Author?.Points
+    @Model.CreatedAt
     <div id="Page">
         @{
-            Html.RenderPartialAsync("_Lesson", Model.Item2);
+            await Html.RenderPartialAsync("_Lesson", Model.currentLesson);
         }
     </div>
+    @{
+        if (Model.currentLesson?.Page <= 1)
+        {
+            <button id="prev" disabled>Poprzednia strona</button>
+        }
+        else
+        {
+            <button id="prev" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id = Model.SelfReference?.Id, page = @Model.currentLesson?.Page - 1})'">Poprzednia strona</button>
+        }
+        <button id="test">Przejdź do testu</button>
+        if (Model.currentLesson?.Page >= Model.NumPages)
+        {
+            <button id="next" disabled>Następna strona</button>
+        }
+        else
+        {
+            <button id="next" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id = Model.SelfReference?.Id, page = @Model.currentLesson?.Page + 1})'">Następna strona</button>
+        }
+    }
+    
+
 </div>
+
 
 
