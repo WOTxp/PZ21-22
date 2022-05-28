@@ -15,4 +15,6 @@
     @{
         await Html.RenderPartialAsync("_Question", model: Model.currentQuestion);
     }
+    <button id = "prev" onclick="location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=1})'">Poprzedni</button>
+    <button id = "next" onclick="location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=2})'">Nastepny</button>
 </div>
