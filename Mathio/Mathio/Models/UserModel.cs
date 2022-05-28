@@ -11,7 +11,7 @@ public class UserModel
     [FirestoreDocumentId]
     public DocumentReference? Self { get; set; }
     [FirestoreProperty]
-    [Required]
+    [Required(ErrorMessage = "Nazwa użytkownika jest wymagana")]
     [RegularExpression("\\w*", ErrorMessage = "Dozwolone tylko litery, cyfry i znak _")]
     [DisplayName("Nazwa użytkownika")]
     public string? UserName { get; set; }

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Google.Cloud.Firestore;
+﻿using Google.Cloud.Firestore;
 
 namespace Mathio.Models;
 [FirestoreData]
@@ -13,7 +12,7 @@ public class TestHistoryModel
     public Timestamp? Date { get; set; }
     [FirestoreProperty]
     public DocumentReference? TaskReference { get; set; }
-    public TasksModel? Task { get; set; }
+    public TasksModel? Task { get; private set; }
 
     public async Task<TasksModel?> DownloadTask()
     {

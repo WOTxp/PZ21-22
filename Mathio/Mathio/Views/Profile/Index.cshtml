@@ -277,7 +277,7 @@ body{
                     <tr><td class="field-2">Opis</td><td class="data-field-2">@Model.Description</td></tr>
                 </table>
             </div>
-            <a href="/Profile/Settings/Index" class="normal-link">
+            <a href="/Profile/Settings" class="normal-link">
                 <div id="button-div-settings">
                     <h4>Zmień</h4>
                 </div>
@@ -292,7 +292,7 @@ body{
                     {
                         foreach (var taskStatus in @Model.TasksStatus)
                         {
-    
+                            
                             <p>
                                 Task: @taskStatus.Task?.Title, Category: @taskStatus.Task?.Category<br/>
                                 Autor: (@taskStatus.Task?.Author?.Type) @taskStatus.Task?.Author?.UserName<br/>
