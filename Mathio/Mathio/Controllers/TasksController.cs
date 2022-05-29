@@ -91,7 +91,7 @@ public class TasksController : Controller
     }
 
     [HttpPost]
-    public IActionResult SaveAnswer([Bind("QuestionId","Answer")]QuestionAnswerModel model)
+    public IActionResult SaveAnswer([Bind("QuestionId, Answer")]QuestionAnswerModel model)
     {
         Console.WriteLine("HI");
         if (!ModelState.IsValid) return Json(new {success = false, msg = "No model!"});

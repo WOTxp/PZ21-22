@@ -40,7 +40,7 @@ public class TestManager
             currentQuestion = null;
             return null;
         }
-        if(num >= testQuestions.Count)
+        if(num < 0 &&  num >= testQuestions.Count)
         {
             currentQuestion = null;
             return null;

@@ -4,6 +4,7 @@
     @{
         if (Model != null)
         {
+            @Model.Question
             Model.AnswerModel.QuestionId = Model.ID;
             if (Model.Type == "open")
             {

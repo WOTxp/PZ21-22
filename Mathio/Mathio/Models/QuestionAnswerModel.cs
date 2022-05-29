@@ -4,8 +4,6 @@ namespace Mathio.Models;
 
 public class QuestionAnswerModel
 {
-    [Required]
-    public string? QuestionId;
-    [Required]
-    public string Answer;
+    public string? QuestionId { get; set;}
+    public string? Answer { get; init; }
 }
