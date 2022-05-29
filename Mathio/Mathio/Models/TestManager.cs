@@ -14,22 +14,22 @@ public class TestManager
     {
         testQuestions = new List<QuestionModel>();
         await Task.DownloadAllQuestions();
-        List<int> indicies = new List<int>();
-        for (int i = 0; i < Task.Questions.Count; i++)
+        List<int> indices = new List<int>();
+        for (int i = 0; i < Task.Questions?.Count; i++)
         {
-            indicies.Add(i);
+            indices.Add(i);
         }
 
         Random r = new Random();
         for (int i = 0; i < Task.QuestionsPerTest; i++)
         {
-            int index = r.Next(indicies.Count);
+            int index = indices[r.Next(indices.Count)];
             
             Console.WriteLine(index);
-            Console.WriteLine(Task.Questions[index].Question);
+            Console.WriteLine(Task.Questions?[index].Question);
             
             testQuestions.Add(Task.Questions[index]);
-            indicies.Remove(index);
+            indices.Remove(index);
         }
     }
 
@@ -47,5 +47,13 @@ public class TestManager
         }
         currentQuestion = testQuestions[num];
         return currentQuestion;
+    }
+
+    public bool SaveAnswer(QuestionAnswerModel answerModel)
+    {
+        var question = testQuestions?.Find(m => m.ID == answerModel.QuestionId);
+        if (question == null) return false;
+        question.AnswerModel = answerModel;
+        return true;
     }
 }

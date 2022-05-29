@@ -1,7 +1,11 @@
-﻿namespace Mathio.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Mathio.Models;
 
 public class QuestionAnswerModel
 {
+    [Required]
     public string? QuestionId;
-    public string? Answer;
+    [Required]
+    public string Answer;
 }

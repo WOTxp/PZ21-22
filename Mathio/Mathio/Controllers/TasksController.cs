@@ -75,6 +75,7 @@ public class TasksController : Controller
         }
 
         _testManager.GetQuestion(num - 1);
+        TempData["num"] = num;
         return View(_testManager);
     }
 
@@ -90,16 +91,23 @@ public class TasksController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> SendAnswer(QuestionModel? model)
+    public IActionResult SaveAnswer([Bind("QuestionId","Answer")]QuestionAnswerModel model)
     {
-        if (model != null)
-        {
-            var Odp = model.AnswerModel;
-            Console.WriteLine("Odpowiedź");
-            Console.WriteLine(Odp.QuestionId, Odp.Answer);
-            //var question = _testManager.testQuestions.Where(m => m.ID == Odp.QuestionId)
-        }
-        return null;
+        Console.WriteLine("HI");
+        if (!ModelState.IsValid) return Json(new {success = false, msg = "No model!"});
+        Console.WriteLine("HI?");
+        Console.WriteLine(model.QuestionId+" "+model.Answer);
+        if (model.QuestionId == null) return Json(new {success = false, msg = "Wrong data!"});
+       
+        Console.WriteLine(model.QuestionId, model.Answer);
+        
+        if (_testManager == null) return Json(new {success = false, msg = "No Test Manager!"});
+        
+        if (_testManager.currentQuestion?.ID != model.QuestionId)
+            return Json(new {success = false, msg = "Something went wrong!"});
+
+        var saved = _testManager.SaveAnswer(model);
+        return Json(saved ? new {success=true, msg="Answer saved!"} : new {success = false, msg = "Something went wrong!"});
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

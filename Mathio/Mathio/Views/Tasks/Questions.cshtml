@@ -15,6 +15,21 @@
     @{
         await Html.RenderPartialAsync("_Question", model: Model.currentQuestion);
     }
-    <button id = "prev" onclick="location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=1})'">Poprzedni</button>
-    <button id = "next" onclick="location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=2})'">Nastepny</button>
+    <button id = "prev" onclick="location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 2)-1})'">Poprzedni</button>
+    <button id = "next">Nastepny</button>
 </div>
+<script type="text/javascript" defer>
+$("#next").on("click", function () {
+    alert($("#AnswerForm").serialize());
+    $.ajax({
+        type: "POST",
+        url: '@Url.Action("SaveAnswer", "Tasks")',
+        data: $("#AnswerForm").serialize(),
+        dataType: "json",
+        success: function (response) {
+            alert(response["msg"])
+            location.href = '@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 0)+1})'
+        }
+    });
+});
+</script>
