@@ -7,19 +7,30 @@ namespace Mathio.Models;
 public class TasksModel
 {
     [FirestoreDocumentId]
-    public string ID { get; set; }
+    public string? Id { get; set; }
+    [FirestoreProperty]
+    public DocumentReference? AuthorReference { get; set; }
     [Required]
     [FirestoreProperty]
-    public DocumentReference Author { get; set; }
-    [Required]
+    public string? Title { get; set; }
     [FirestoreProperty]
-    public string Title { get; set; }
+    public string? Description { get; set; }
     [FirestoreProperty]
-    public string Description { get; set; }
+    public string? Category { get; set; }
     [FirestoreProperty]
-    public string Category { get; set; }
-    public override string ToString()
+    public int QuestionsPerTask { get; set; }
+    [FirestoreProperty]
+    public int NumPages { get; set; }
+    public UserModel? Author { get; set; }
+
+    public async Task<UserModel?> DownloadAuthor()
     {
-        return String.Format("ID: {0}\nAuthor: {1}\nTitle: {2}\nDescription: {3}\n",ID,Author.ToString(),Title,Description);
+        if (AuthorReference == null) return null;
+        if (Author != null) return Author;
+        
+        var snapshot = await AuthorReference.GetSnapshotAsync();
+        Author = snapshot.ConvertTo<UserModel>();
+        return Author;
+
     }
 }

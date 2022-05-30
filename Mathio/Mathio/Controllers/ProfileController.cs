@@ -1,79 +1,91 @@
 ﻿using System.Diagnostics;
+using Firebase.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
-using Firebase.Auth;
-using FirebaseAdmin;
-using FirebaseAdmin.Auth;
-using FirebaseAuth = FirebaseAdmin.Auth.FirebaseAuth;
-using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
 using Google.Cloud.Firestore;
-
+using FirebaseAuthException = Firebase.Auth.FirebaseAuthException;
 
 namespace Mathio.Controllers;
 
 public class ProfileController : Controller
 {
-    private FirebaseAuthProvider _auth;
-    private FirestoreDb _db;
+    private readonly FirebaseAuthProvider _auth;
+    private readonly FirestoreDb _db;
 
     public ProfileController()
     {
         _auth = new FirebaseAuthProvider(
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
-        if (FirebaseAuth.DefaultInstance==null)
-        {
-            FirebaseApp.Create();
-        }
+
         _db = FirestoreDb.Create("pz202122-cf12f");
     }
-    // GET
-    public IActionResult Index()
+    //GET: /Profile
+    [HttpGet]
+    public async Task<IActionResult> Index()
     {
-        return View();
-    }
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", routeValues: new {returnUrl = "/Profile"});
+        }
 
+        try
+        {
+            var user = await _auth.GetUserAsync(token);
+            var userDoc = _db.Collection("Users").Document(user.LocalId);
+            var userSnap = await userDoc.GetSnapshotAsync();
+            var userModel = userSnap.ConvertTo<UserModel>();
+            userModel.Email = user.Email;
+
+            //Add finished tasks
+            await userModel.DownloadTasksStatus();
+            if (userModel.TasksStatus == null) 
+                return View(userModel);
+            foreach (var taskStatus in userModel.TasksStatus)
+            {
+                var task = await taskStatus.DownloadTask();
+                if (task != null)
+                {
+                    await task.DownloadAuthor();
+                }
+            }
+            return View(userModel);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            return RedirectToAction("SignIn", routeValues: new {returnUrl = "/Profile"});
+        }
+    }
+    //GET: /Profile/Register
     public IActionResult Register()
     {
         return View();
     }
-
-    public IActionResult Settings()
-    {
-        string? token = HttpContext.Session.GetString("_UserToken");
-        if (!String.IsNullOrEmpty(token))
-        {
-            try
-            {
-                var user = _auth.GetUserAsync(token).Result;
-                UserModel userModel = new UserModel()
-                {
-                    Email = user.Email,
-                    UserName = user.DisplayName
-                };
-                return View("Settings/Index", userModel);
-            }
-            catch (Exception)
-            {
-                return RedirectToAction("SignIn");
-            }
-        }
-        return RedirectToAction("SignIn");
-    }
+    //POST: /Profile/Register
     [HttpPost]
-    public async Task<IActionResult> Register(UserModel userModel)
+    public async Task<IActionResult> Register(RegisterViewModel model)
     {
+        if (!ModelState.IsValid) return View();
         try
         {
             //create the user
             var fbAuth = await _auth.
-                CreateUserWithEmailAndPasswordAsync(userModel.Email, userModel.Password, userModel.UserName,
-                true);
-
-            userModel.ID = fbAuth.User.LocalId;
-            userModel.Type = "user";
-            userModel.Points = 0;
-            CollectionReference usersRef = _db.Collection("Users");
-            await usersRef.Document(userModel.ID).SetAsync(userModel);
+                CreateUserWithEmailAndPasswordAsync(model.Email, model.Password, sendVerificationEmail:true);
+            var usersRef = _db.Collection("Users");
+            var user = new UserModel
+            {
+                Self = null,
+                Type = "user",
+                UserName = model.UserName,
+                Points = 0
+            };
+            
+            await usersRef.Document(fbAuth.User.LocalId).SetAsync(user);
 
             TempData["msg"] = "Pomyślnie zarejestrowano";
             return RedirectToAction("SignIn");
@@ -82,10 +94,10 @@ public class ProfileController : Controller
             switch (e.Reason)
             {
                 case AuthErrorReason.EmailExists:
-                    ViewBag.Reason = "Konto z tym adresem e-mail już istnieje";
+                    ModelState.AddModelError("Email", "Konto z tym adresem e-mail już istnieje"); 
                     break;
                 case AuthErrorReason.WeakPassword:
-                    ViewBag.Reason = "Hasło nie spełnia wymagań bezpieczeństwa";
+                    ModelState.AddModelError("Password", "Hasło nie spełnia wymagań bezpieczeństwa");
                     break;
                 default:
                     ViewBag.Reason = e.Reason;
@@ -95,35 +107,44 @@ public class ProfileController : Controller
             return View();
         }
     }
-    
-    public IActionResult SignIn()
+    //GET: /Profile/SignIn
+    public IActionResult SignIn(string? returnUrl)
     {
+        if (string.IsNullOrEmpty(returnUrl))
+        {
+            return View();
+        }
+        ViewBag.ReturnUrl = returnUrl;
         return View();
     }
+    //POST: /Profile/SignIn
     [HttpPost]
-    public async Task<IActionResult> SignIn(UserModel userModel)
+    public async Task<IActionResult> SignIn(SignInViewModel model, string? returnUrl)
     {
+        if (!ModelState.IsValid) return View();
+        if (returnUrl != null) ViewBag.ReturnUrl = returnUrl;
         try
         {
             //log in the new user
             var fbAuth = await _auth
-                .SignInWithEmailAndPasswordAsync(userModel.Email, userModel.Password);
+                .SignInWithEmailAndPasswordAsync(model.Email, model.Password);
             await fbAuth.RefreshUserDetails();
-            string token = fbAuth.FirebaseToken;
+            var token = fbAuth.FirebaseToken;
             //saving the token in a session variable
             if (token != null && fbAuth.User.IsEmailVerified)
             {
                 HttpContext.Session.SetString("_UserToken", token);
-                return RedirectToAction("Index");
+                if (returnUrl != null) return Redirect(returnUrl);
+                return RedirectToAction("Index", "Home");
             }
             else if (!fbAuth.User.IsEmailVerified)
             {
-                ViewBag.Reason = "Email nie zweryfikowany!";
+                ModelState.AddModelError("Email", "Email nie zweryfikowany!");
                 return View();
             }
             else
             {
-                ViewBag.Reason = "Nieudane logowanie!";
+                ViewBag.Reason = "Błąd logowania!";
                 return View();
             }
         }
@@ -132,10 +153,10 @@ public class ProfileController : Controller
             switch (e.Reason)
             {
                 case AuthErrorReason.WrongPassword:
-                    ViewBag.Reason = "Nieprawidłowe hasło";
+                    ModelState.AddModelError("Password", "Nieprawidłowe hasło");
                     break;
                 case AuthErrorReason.UnknownEmailAddress:
-                    ViewBag.Reason = "Nieznany adres e-mail";
+                    ModelState.AddModelError("Email", "Nieznany adres e-mail");
                     break;
                 default:
                     ViewBag.Reason = e.Reason;
@@ -144,51 +165,88 @@ public class ProfileController : Controller
             return View();
         }
     }
-    [HttpPost]
-    public IActionResult LogOut(string msg="Pomyślnie wylogowano"){
+    //GET: /Profile/LogOut
+    [HttpGet]
+    public IActionResult LogOut(){
         HttpContext.Session.Remove("_UserToken");
-        TempData["msg"] = msg;
+        TempData["msg"] = "Pomyślnie wylogowano";
         return RedirectToAction("SignIn");
     }
-    
-    [Route("Profile/Settings/ChangePassword")]
-    [HttpPost]
-    public async Task<IActionResult> ChangePassword(ChangePasswordModel data)
+    //GET: /Profile/Settings
+    [Route("Profile/Settings")]
+    public async Task<IActionResult> Settings()
     {
-        Console.WriteLine("Haslo");
-        Console.WriteLine(data.OldPassword);
-        Console.WriteLine("Nowe haslo:");
-        Console.WriteLine(data.NewPassword);
-        if (data.OldPassword == null)
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
         {
-            ViewBag.Reason = "Nie podano aktualnego hasła";
-            return Settings();
-        }
-
-        if (data.NewPassword == null)
-        {
-            ViewBag.Reason = "Nie podano nowego hasła";
-            return Settings();
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", routeValues:new{returnUrl="/Profile/Settings"});
         }
         try
         {
-            string? token = HttpContext.Session.GetString("_UserToken");
-            Console.WriteLine("token:");
-            Console.WriteLine(token);
             var user = await _auth.GetUserAsync(token);
-            string uid = user.LocalId;
-            Console.Write("UID:");
-            Console.WriteLine(uid);
-            await _auth.SignInWithEmailAndPasswordAsync(user.Email, data.OldPassword);
-            
-            UserRecordArgs args = new UserRecordArgs()
+            var doc = await _db.Collection("Users").Document(user.LocalId).GetSnapshotAsync();
+            var userModel = doc.ConvertTo<UserModel>();
+
+            return View("Settings/Index", userModel);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
             {
-                Uid = uid,
-                Password = data.NewPassword,
-            };
-            await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
-            string msg = "Pomyślnie zmieniono hasło. Zaloguj się ponownie";
-            return LogOut(msg);
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            return RedirectToAction("SignIn", routeValues:new{returnUrl="/Profile/Settings"});
+        }
+    }
+    //GET: /Profile/Settings/ChangePassword
+    [Route("Profile/Settings/ChangePassword")]
+    [HttpGet]
+    public async Task<IActionResult> ChangePassword()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby zmienić hasło";
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
+        }
+        
+        try
+        {
+            await _auth.GetUserAsync(token);
+            return View("Settings/ChangePassword");
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby zmienić hasło";
+            }
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
+        }
+    }
+    //POST: /Profile/Settings/ChangePassword
+    [Route("Profile/Settings/ChangePassword")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(ChangePasswordModel data)
+    {
+        if (!ModelState.IsValid) return View("Settings/ChangePassword");
+        try
+        {
+            var token = HttpContext.Session.GetString("_UserToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["msg"] = "Zaloguj się aby zmienić hasło";
+                return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
+            }
+            var loggedUser = await  _auth.GetUserAsync(token);
+            var authLink = await _auth.SignInWithEmailAndPasswordAsync(loggedUser.Email, data.OldPassword);
+            HttpContext.Session.SetString("_UserToken", authLink.FirebaseToken);
+            authLink = await _auth.ChangeUserPassword(token, data.NewPassword);
+            HttpContext.Session.SetString("_UserToken", authLink.FirebaseToken);
+            ViewBag.Success = "Pomyślnie zmieniono hasło.";
+            return View("Settings/ChangePassword");
 
         }
         catch (FirebaseAuthException e)
@@ -196,62 +254,326 @@ public class ProfileController : Controller
             switch (e.Reason)
             {
                 case AuthErrorReason.WrongPassword:
-                    ViewBag.Reason = "Nieprawidłowe hasło";
+                    ModelState.AddModelError("OldPassword", "Nieprawidłowe hasło");
                     break;
                 case AuthErrorReason.MissingPassword:
-                    ViewBag.Reason = "Nie podano aktualnego hasła";
+                    ModelState.AddModelError("OldPassword", "Nie podano aktualnego hasła");
                     break;
+                case AuthErrorReason.WeakPassword:
+                    ModelState.AddModelError("NewPassword", "Hasło nie spełnia wymagań bezpieczeństwa");
+                    break;
+                case AuthErrorReason.InvalidIDToken:
+                    TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby zmienić hasło";
+                    return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/Settings/ChangePassword"});
                 default:
                     ViewBag.Reason = e.Reason;
                     break;
             }
-        }
-        catch (ArgumentException)
-        {
-            ViewBag.Reason = "Nowe hasło nie spełnia wymagań bezpieczeństwa";
         }
         catch (Exception e)
         {
             ViewBag.Reason = e.Message;
         }
         
-        
-        return Settings();
+        return View("Settings/ChangePassword");
     }
-    [Route("Profile/Settings/UpdateEmail")]
-    [HttpPost]
-    public async Task<IActionResult> UpdateEmail(string email)
-    {
-        Console.WriteLine("Email:");
-        Console.WriteLine(email);
-        string? token = HttpContext.Session.GetString("_UserToken");
-        string uid = _auth.GetUserAsync(token).Result.LocalId;
-        UserRecordArgs args = new UserRecordArgs()
-        {
-            Uid = uid,
-            Email = email,
-        };
-        await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
-        
-        return Settings();
-    }
+    //POST: /Profile/Settings/UpdateDisplayName
     [Route("Profile/Settings/UpdateDisplayName")]
     [HttpPost]
-    public async Task<IActionResult> UpdateDisplayName(string dName)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateDisplayName(ChangeUserNameModel settings)
     {
-        Console.WriteLine("DisplayName:");
-        Console.WriteLine(dName);
-        string? token = HttpContext.Session.GetString("_UserToken");
-        string uid = _auth.GetUserAsync(token).Result.LocalId;
-        UserRecordArgs args = new UserRecordArgs()
+        var errors = new Dictionary<string, List<string>> {{"auth", new List<string>()}};
+        //Authorize
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
         {
-            Uid = uid,
-            DisplayName = dName,
-        };
-        await FirebaseAuth.DefaultInstance.UpdateUserAsync(args);
-        return Settings();
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
+            errors["auth"].Add("Zaloguj się aby kontynuować");
+            return Json(new {success = false, errors, data = settings.UserName});
+        }
+        User user;
+        try
+        {
+            user = await _auth.GetUserAsync(token);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
+            return Json(new {success = false, errors, data = settings.UserName});
+        }
+
+        errors.Remove("auth");
+        errors.Add("UserName", new List<string>());
+        //Check Model State
+        if (!ModelState.IsValid)
+        {
+            foreach (var (_, value) in ModelState)
+            {
+                foreach (var error in value.Errors)
+                {
+                    errors["UserName"].Add(error.ErrorMessage);
+                }
+            }
+            return Json(new {success = false, errors, data = settings.UserName});
+        }
+        //Try update
+        try
+        {
+            await _db.Collection("Users").Document(user.LocalId).UpdateAsync("UserName", settings.UserName);
+            TempData["Success"] = "Pomyślnie zmieniono nazwę użytkownika";
+            return Json(new {success = true, data = settings.UserName});
+        }
+        catch (Grpc.Core.RpcException e)
+        {
+            errors["UserName"].Add(e.StatusCode == Grpc.Core.StatusCode.NotFound
+                ? "Błąd aktualizacji bazy danych. Nie znaleziono wpisu."
+                : "Błąd aktualizacji bazy danych");
+            
+            return Json(new {success = false, errors, data = settings.UserName});
+        }
     }
-    
+    //POST: /Profile/Settings/UpdateFirstName
+    [Route("Profile/Settings/UpdateFirstName")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateFirstName([Bind("FirstName")]ChangeUserInfoModel settings)
+    {
+        var errors = new Dictionary<string, List<string>> {{"auth", new List<string>()}};
+        //Authorize
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
+            errors["auth"].Add("Zaloguj się aby kontynuować");
+            return Json(new {success = false, errors, data = settings.FirstName});
+        }
+        User user;
+        try
+        {
+            user = await _auth.GetUserAsync(token);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
+            return Json(new {success = false, errors, data = settings.FirstName});
+        }
+
+        errors.Remove("auth");
+        errors.Add("FirstName", new List<string>());
+        //Check Model State
+        if (!ModelState.IsValid)
+        {
+            foreach (var (_, value) in ModelState)
+            {
+                foreach (var error in value.Errors)
+                {
+                    errors["FirstName"].Add(error.ErrorMessage);
+                }
+            }
+            return Json(new {success = false, errors, data = settings.FirstName});
+        }
+        //Try update
+        try
+        {
+            await _db.Collection("Users").Document(user.LocalId).UpdateAsync("FirstName", settings.FirstName);
+            TempData["Success"] = "Pomyślnie zmieniono imię";
+            return Json(new {success = true, data = settings.FirstName});
+        }
+        catch (Grpc.Core.RpcException e)
+        {
+            errors["FirstName"].Add(e.StatusCode == Grpc.Core.StatusCode.NotFound
+                ? "Błąd aktualizacji bazy danych. Nie znaleziono wpisu."
+                : "Błąd aktualizacji bazy danych");
+            
+            return Json(new {success = false, errors, data = settings.FirstName});
+        }
+    }
+    //POST: /Profile/Settings/UpdateLastName
+    [Route("Profile/Settings/UpdateLastName")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateLastName([Bind("LastName")]ChangeUserInfoModel settings)
+    {
+        var errors = new Dictionary<string, List<string>> {{"auth", new List<string>()}};
+        //Authorize
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
+            errors["auth"].Add("Zaloguj się aby kontynuować");
+            return Json(new {success = false, errors, data = settings.LastName});
+        }
+        User user;
+        try
+        {
+            user = await _auth.GetUserAsync(token);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
+            return Json(new {success = false, errors, data = settings.LastName});
+        }
+        errors.Remove("auth");
+        errors.Add("LastName", new List<string>());
+        //Check Model State
+        if (!ModelState.IsValid)
+        {
+            foreach (var (_, value) in ModelState)
+            {
+                foreach (var error in value.Errors)
+                {
+                    errors["LastName"].Add(error.ErrorMessage);
+                }
+            }
+            return Json(new {success = false, errors, data = settings.LastName});
+        }
+        //Try update
+        try
+        {
+            await _db.Collection("Users").Document(user.LocalId).UpdateAsync("LastName", settings.LastName);
+            TempData["Success"] = "Pomyślnie zmieniono nazwisko";
+            return Json(new {success = true, data = settings.LastName});
+        }
+        catch (Grpc.Core.RpcException e)
+        {
+            errors["LastName"].Add(e.StatusCode == Grpc.Core.StatusCode.NotFound
+                ? "Błąd aktualizacji bazy danych. Nie znaleziono wpisu."
+                : "Błąd aktualizacji bazy danych");
+            
+            return Json(new {success = false, errors, data = settings.LastName});
+        }
+    }
+    //POST: /Profile/Settings/UpdateDescription
+    [Route("Profile/Settings/UpdateDescription")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateDescription([Bind("Description")]ChangeUserInfoModel settings)
+    {
+        var errors = new Dictionary<string, List<string>> {{"auth", new List<string>()}};
+        //Authorize
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
+            errors["auth"].Add("Zaloguj się aby kontynuować");
+            return Json(new {success = false, errors, data = settings.Description});
+        }
+        User user;
+        try
+        {
+            user = await _auth.GetUserAsync(token);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
+            return Json(new {success = false, errors, data = settings.Description});
+        }
+
+        errors.Remove("auth");
+        errors.Add("Description", new List<string>());
+        //Check Model State
+        if (!ModelState.IsValid)
+        {
+            foreach (var (_, value) in ModelState)
+            {
+                foreach (var error in value.Errors)
+                {
+                    errors["Description"].Add(error.ErrorMessage);
+                }
+            }
+            return Json(new {success = false, errors, data = settings.Description});
+        }
+        //Try update
+        try
+        {
+            await _db.Collection("Users").Document(user.LocalId).UpdateAsync("Description", settings.Description);
+            TempData["Success"] = "Pomyślnie zmieniono opis";
+            return Json(new {success = true, data = settings.Description});
+        }
+        catch (Grpc.Core.RpcException e)
+        {
+            errors["Description"].Add(e.StatusCode == Grpc.Core.StatusCode.NotFound
+                ? "Błąd aktualizacji bazy danych. Nie znaleziono wpisu."
+                : "Błąd aktualizacji bazy danych");
+            
+            return Json(new {success = false, errors, data = settings.Description});
+        }
+    }
+    //GET: /Profile/History
+    public async Task<IActionResult> History()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby zobaczyć swoją historię";
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/History"});
+        }
+        
+        try
+        {
+            var user = await _auth.GetUserAsync(token);
+            var userDoc = await _db.Collection("Users").Document(user.LocalId).GetSnapshotAsync();
+            var userModel = userDoc.ConvertTo<UserModel>();
+            await userModel.DownloadTestsHistory();
+            //Add tests from history
+            if (userModel.TestsHistory == null) 
+                return View(userModel);
+            foreach (var historyTest in userModel.TestsHistory)
+            {
+                var task = await historyTest.DownloadTask();
+                if (task != null)
+                {
+                    await task.DownloadAuthor();
+                }
+            }
+            return View(userModel);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby zobaczyć swoją historię";
+            }
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/History"});
+        }
+    }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

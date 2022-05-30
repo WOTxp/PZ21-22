@@ -1,0 +1,7 @@
+﻿@model Mathio.Models.TasksAllModel
+
+@Html.EditorFor(m => m.Questions)
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
