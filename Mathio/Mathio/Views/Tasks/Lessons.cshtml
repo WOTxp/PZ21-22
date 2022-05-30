@@ -11,7 +11,7 @@
     @Model.Description
     @Model.Author?.UserName
     @Model.Author?.Points
-    @Model.CreatedAt
+    @Model.LastUpdate
     <div id="Page">
         @{
             await Html.RenderPartialAsync("_Lesson", Model.currentLesson);

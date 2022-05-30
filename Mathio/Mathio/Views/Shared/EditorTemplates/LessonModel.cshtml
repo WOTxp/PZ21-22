@@ -1,8 +1,11 @@
 ﻿@model Mathio.Models.LessonModel
 
-<div class="lesson">
+
+<div class="lesson" hidden="@Model.Deleted">
+    <div class="del_lesson" type="button">Usuń</div>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="ID" hidden/>
+    @Html.HiddenFor(m => m.ID)
+    @Html.HiddenFor(m => m.Deleted, new { @class="deleted" })
     <div class="form-group text-center field-group-extra">
         <label asp-for="Page" class="control-label hide"></label>
         <input asp-for="Page" class="form-control field-extra" placeholder="Strona"/>

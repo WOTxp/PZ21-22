@@ -10,9 +10,6 @@ public class QuestionModel
     public string? ID { get; set; }
     [Required]
     [FirestoreProperty]
-    public int Number { get; set; }
-    [Required]
-    [FirestoreProperty]
     public string Question { get; set; }
     [Required]
     [FirestoreProperty]
@@ -22,16 +19,16 @@ public class QuestionModel
     [Required]
     [FirestoreProperty]
     public string CorrectAnswer { get; set; }
-    public bool Deleted = false;
-    
-    public QuestionAnswerModel AnswerModel { get; set; }
 
+    public QuestionAnswerModel AnswerModel { get; set; }
+    public bool Deleted { get; set; }
     public QuestionModel()
     {
         AnswerModel = new QuestionAnswerModel();
+        Deleted = false;
     }
     public override string ToString()
     {
-        return String.Format("{0}\nQuestion: {1}\n",Number,Question);
+        return String.Format("\nQuestion: {1}\n",Question);
     }
 }

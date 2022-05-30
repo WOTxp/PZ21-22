@@ -18,18 +18,22 @@ public class TasksModel
     public string? Description { get; set; }
     [FirestoreProperty]
     public string? Category { get; set; }
+    [Required]
     [FirestoreProperty]
     public int QuestionsPerTest { get; set; }
     [FirestoreProperty]
     public int NumPages { get; set; }
     [FirestoreProperty]
-    public Timestamp? CreatedAt { get; set; }
+    public Timestamp? LastUpdate { get; set; }
     
     public UserModel? Author { get; set; }
     public List<LessonModel>? Lessons { get; set; }
     public List<QuestionModel>? Questions { get; set; }
     
     public LessonModel? currentLesson { get; set; }
+    
+    public string SelfID { get; set; }
+    public string AuthorId { get; set; }
     public async Task<UserModel?> DownloadAuthor()
     {
         if (AuthorReference == null) return null;

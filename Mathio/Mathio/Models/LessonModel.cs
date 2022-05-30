@@ -14,8 +14,12 @@ public class LessonModel
     [Required]
     [FirestoreProperty]
     public string Content { get; set; }
-    
-    public bool Deleted = false;
+
+    public bool Deleted { get; set; }
+    public LessonModel()
+    {
+        Deleted = false;
+    }
     public override string ToString()
     {
         return String.Format("{0}\nContent: {1}\n",Page,Content);
