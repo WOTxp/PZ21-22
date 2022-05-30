@@ -249,7 +249,7 @@
 $("#load").on("click", function () {
     $.ajax({
         type: "GET",
-        url: '@Url.Action("LoadMoreTasksM", "TasksManager", new { batchSize=2 })',
+        url: '@Url.Action("LoadMoreTasksM", "TasksManager", new { batchSize=1 })',
         success: function (response) {
             alert(response)
             document.getElementById("tasks").innerHTML+=response;
