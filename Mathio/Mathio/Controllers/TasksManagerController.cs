@@ -267,7 +267,7 @@ public class TasksManager : Controller
         {
             var userId = _auth.GetUserAsync(token).Result.LocalId;
             DocumentReference author = _db.Collection("Users").Document(userId);
-            Query tasksQuery = _db.Collection("Tasks").WhereEqualTo("Author", author).OrderBy("Category");
+            Query tasksQuery = _db.Collection("Tasks").WhereEqualTo("AuthorReference", author).OrderBy("Category");
             if (_lastDoc != null)
             {
                 tasksQuery = tasksQuery.StartAfter(_lastDoc);
