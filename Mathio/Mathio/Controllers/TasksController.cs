@@ -56,6 +56,7 @@ public class TasksController : Controller
         {
             var taskDoc = await _db.Collection("Tasks").Document(id).GetSnapshotAsync();
             _openedTask = taskDoc.ConvertTo<TasksModel>();
+            await _openedTask.DownloadAuthor();
         }
 
         await _openedTask.GetLesson(page);

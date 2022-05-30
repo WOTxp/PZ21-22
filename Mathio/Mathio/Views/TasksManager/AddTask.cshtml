@@ -115,19 +115,21 @@ ul.answers{
                 <span asp-validation-for="QuestionsPerTest" class="text-danger"></span>
             </div>
         </div>
-        <div id="lessons">
-            @Html.EditorFor(m => m.Lessons)
+        <div class="lessons_block catcher">
+            <div id="lessons">
+                @Html.EditorFor(m => m.Lessons)
+            </div>
+            <button id="addLesson" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj lekcję</button>
         </div>
-        <button id="addLesson" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj lekcję</button>
-        <div id="questions">
-            @Html.EditorFor(m=>m.Questions)
+        <div class="questions_block catcher">
+            <div id="questions">
+                @Html.EditorFor(m=>m.Questions)
+            </div>
+            <button id="addQuestion" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj pytanie</button>
         </div>
-        <button id="addQuestion" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj pytanie</button>
-        <div id="control-buttons">
-            <input type="submit" value="Dodaj" class="btn btn-primary right dblock margin-top-10"/>
-        </div>
+        <input type="submit" value="Dodaj" class="btn btn-primary right dblock margin-top-10"/>
     </form>
-</div>       
+</div>      
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -130,8 +130,9 @@ body{
             </div>
             <div class="width-50">
                 <div id="data-2">
-                    <b>@Model.LastUpdate</b><br/>
-                    Punkty do zdobycia: <b>@Model.Author?.Points</b>
+                    <b>Ostatnia aktualizacja: @Model.LastUpdate?.ToDateTime()</b><br/>
+                    Punkty do zdobycia: <b>@Model.QuestionsPerTest</b><br/>
+                    Strona: <b>@Model.currentLesson?.Page</b>
                 </div>
             </div>
             <div style="clear:both"></div>
