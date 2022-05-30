@@ -4,7 +4,7 @@
     Layout = "_Layout";
 }
 
-<h2>Edit Task</h2>
+<h2>Edycja zadań</h2>
 <form asp-action="EditTask" id="taskForm">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="Task.ID" hidden/>
@@ -23,12 +23,12 @@
         <input asp-for="Task.Description" class="form-control field-extra" placeholder="Opis"/>
         <span asp-validation-for="Task.Description" class="text-danger"></span>
     </div>
-    <h4>Lessons</h4>
+    <h4>Lekcje</h4>
     <div id="lessons">
         @Html.EditorFor(m => m.Lessons)
     </div>
     <button id="addLesson" type="button">Add Lesson</button>
-    <h4>Questions</h4>
+    <h4>Pytania</h4>
     <div id="questions">
         @Html.EditorFor(m => m.Questions)
     </div>
