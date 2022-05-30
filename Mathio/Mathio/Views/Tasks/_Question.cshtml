@@ -1,0 +1,33 @@
+﻿@model QuestionModel?
+
+<div id="Odpowiedz">
+    @{
+        if (Model != null)
+        {
+            @Model.Question
+            Model.AnswerModel.QuestionId = Model.ID;
+            if (Model.Type == "open")
+            {
+                <form id="AnswerForm">
+                    <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden/>
+                    <input name="Answer" asp-for="AnswerModel.Answer"/>
+                </form>
+            }
+            else if(Model.Type == "closed")
+            {
+                <form id="AnswerForm">
+                    <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden/>
+                    <select name="Answer" asp-for="AnswerModel.Answer">
+                        @if (Model?.Answers != null)
+                        {
+                            foreach (var answer in Model.Answers)
+                            {
+                                <option>@answer</option>
+                            }
+                        }
+                    </select>
+                </form>
+            }
+        }
+    }
+</div>

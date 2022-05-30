@@ -29,41 +29,78 @@ public class TasksManager : Controller
     
     public IActionResult AddTask()
     {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager/AddTask"});
+        }
         return View();
     }
     
     [HttpPost]
-    public async Task<IActionResult> AddTask([Bind("Task, Lessons, Questions")] TasksAllModel newTask)
+    public async Task<IActionResult> AddTask(TasksModel newTask)
     {
-        if (ModelState.IsValid)
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
         {
-            CollectionReference tasks = _db.Collection("Tasks");
-            DocumentReference task = await tasks.AddAsync(newTask.Task);
-            
-            CollectionReference lessons = task.Collection("Lessons");
-            foreach (LessonModel l in newTask.Lessons)
-            {
-                await lessons.AddAsync(l);
-            }
-
-            CollectionReference questions = task.Collection("Questions");
-            foreach (QuestionModel q in newTask.Questions)
-            {
-                await questions.AddAsync(q);
-            }
-            
-            return RedirectToAction("Index");
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager/AddTask"});
         }
-        return View(newTask);
+        if (!ModelState.IsValid) return View(newTask);
+        
+        if (newTask.Lessons == null)
+        {
+            ViewData["error_msg"] = "Brak lekcji!";
+            return View(newTask);
+        }
+        var lessonsCount = newTask.Lessons.Count(q => !q.Deleted);
+        if (lessonsCount == 0)
+        {
+            ViewData["error_msg"] = "Brak lekcji!";
+            return View(newTask);
+        }
+        if (newTask.Questions == null)
+        {
+            ViewData["error_msg"] = "Brak pytań!";
+            return View(newTask);
+        }
+
+        var questionsCount = newTask.Questions.Count(q => !q.Deleted);
+        if (questionsCount < newTask.QuestionsPerTest)
+        {
+            ViewData["error_msg"] = "Za mało pytań, musi być minimalnie " + newTask.QuestionsPerTest + "!";
+            return View(newTask);
+        }
+        
+        var user = await _auth.GetUserAsync(token);
+        var authorRef = _db.Collection("Users").Document(user.LocalId);
+        newTask.AuthorReference = authorRef;
+        newTask.NumPages = lessonsCount;
+        newTask.LastUpdate = Timestamp.GetCurrentTimestamp();
+        
+        var task = await _db.Collection("Tasks").AddAsync(newTask);
+            
+        foreach (var l in newTask.Lessons.Where(l => !l.Deleted))
+        {
+            await task.Collection("Lessons").AddAsync(l);
+        }
+            
+        foreach (var q in newTask.Questions.Where(q => !q.Deleted))
+        {
+            await task.Collection("Questions").AddAsync(q);
+        }
+            
+        return RedirectToAction("Index");
     }
     
     public async Task<IActionResult> DeleteTask(string id)
     {
         if (!ModelState.IsValid)
             return RedirectToAction("Index", "TasksManager");
-        DocumentReference task = _db.Collection("Tasks").Document(path: id);
-        TasksModel t = task.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
-        return View(t);
+        var taskDoc = await _db.Collection("Tasks").Document(path: id).GetSnapshotAsync();
+        var task = taskDoc.ConvertTo<TasksModel>();
+        return View(task);
     }
     
     private async Task DeleteCollection(CollectionReference collectionReference, int batchSize){
@@ -102,58 +139,122 @@ public class TasksManager : Controller
         return Json(new {success = true, data=id});
     }
     
-    public async Task<IActionResult> EditTask(string id="")
+    public async Task<IActionResult> EditTask(string id)
     {
-        if (id == "")
+        if(!ModelState.IsValid)
             return RedirectToAction("Index", "TasksManager");
         
-        DocumentReference task = _db.Collection("Tasks").Document(path: id);
-        TasksModel t = task.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
-        
-        List<LessonModel> lessons = new List<LessonModel>(); 
-        QuerySnapshot snap_lessons = await task.Collection("Lessons").GetSnapshotAsync();
-        foreach (DocumentSnapshot l in snap_lessons.Documents)
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
         {
-            lessons.Add(l.ConvertTo<LessonModel>());
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager/EditTask/"+id});
         }
+        var taskDoc = await _db.Collection("Tasks").Document(path: id).GetSnapshotAsync();
+        var task = taskDoc.ConvertTo<TasksModel>();
 
-        List<QuestionModel> questions = new List<QuestionModel>();
-        QuerySnapshot snap_questions = await task.Collection("Questions").GetSnapshotAsync();
-        foreach (DocumentSnapshot q in snap_questions.Documents)
-        {
-            questions.Add(q.ConvertTo<QuestionModel>());
-        }
+        await task.DownloadAllLessons();
+        await task.DownloadAllQuestions();
         
-        TasksAllModel tall = new TasksAllModel
-        {
-            Task = t,
-            Lessons = lessons,
-            Questions = questions
-        };
-        Console.WriteLine(t.Title+" "+t.Id);
-        return View(tall);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> EditTask(TasksAllModel task)
-    {
-        if (ModelState.IsValid)
-        {
-            return RedirectToAction("Index", "TasksManager");
-        }
         return View(task);
     }
 
     [HttpPost]
-    public IActionResult AddLesson([Bind("Lessons")] TasksAllModel m)
+    public async Task<IActionResult> EditTask(TasksModel task)
     {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager"});
+        }
+        task.SelfReference = _db.Collection("Tasks").Document(task.SelfRefId);
+        task.AuthorReference = _db.Collection("Users").Document(task.AuthorRefId);
+        if (!ModelState.IsValid) return View(task);
+        
+        if (task.Lessons == null)
+        {
+            ViewData["error_msg"] = "Brak lekcji!";
+            return View(task);
+        }
+        var lessonsCount = task.Lessons.Count(q => !q.Deleted);
+        if (lessonsCount == 0)
+        {
+            ViewData["error_msg"] = "Brak lekcji!";
+            return View(task);
+        }
+        if (task.Questions == null)
+        {
+            ViewData["error_msg"] = "Brak pytań!";
+            return View(task);
+        }
+        if (task.SelfReference == null)
+        {
+            ViewData["error_msg"] = "Coś poszło nie tak!";
+            return View(task);
+        }
+
+        var questionsCount = task.Questions.Count(q => !q.Deleted);
+        if (questionsCount < task.QuestionsPerTest)
+        {
+            ViewData["error_msg"] = "Za mało pytań, musi być minimalnie " + task.QuestionsPerTest + "!";
+            return View(task);
+        }
+        
+        task.NumPages = lessonsCount;
+        task.LastUpdate = Timestamp.GetCurrentTimestamp();
+        
+        await task.SelfReference.SetAsync(task);
+            
+        foreach (var l in task.Lessons.Where(l => !l.Deleted))
+        {
+            if (string.IsNullOrEmpty(l.ID))
+            {
+                await task.SelfReference.Collection("Lessons").AddAsync(l);
+            }
+            else
+            {
+                await task.SelfReference.Collection("Lessons").Document(l.ID).SetAsync(l);
+            }
+        }
+
+        foreach (var l in task.Lessons.Where(l => !string.IsNullOrEmpty(l.ID) && l.Deleted))
+        {
+            await task.SelfReference.Collection("Lessons").Document(l.ID).DeleteAsync();
+        }
+            
+        foreach (var q in task.Questions.Where(q => !q.Deleted))
+        {
+            if (string.IsNullOrEmpty(q.ID))
+            {
+                await task.SelfReference.Collection("Questions").AddAsync(q);
+            }
+            else
+            {
+                await task.SelfReference.Collection("Questions").Document(q.ID).SetAsync(q);
+            }
+        }
+        
+        foreach (var q in task.Questions.Where(q => !string.IsNullOrEmpty(q.ID) && q.Deleted))
+        {
+            await task.SelfReference.Collection("Questions").Document(q.ID).DeleteAsync();
+        }
+            
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult AddLesson([Bind("Lessons")] TasksModel m)
+    {
+        m.Lessons ??= new List<LessonModel>();
         m.Lessons.Add(new LessonModel());
         Console.WriteLine(m.Lessons.Count);
         return PartialView("TasksManager/_LessonsList", m);
     }
     [HttpPost]
-    public IActionResult AddQuestion([Bind("Questions")] TasksAllModel m)
+    public IActionResult AddQuestion([Bind("Questions")] TasksModel m)
     {
+        m.Questions ??= new List<QuestionModel>();
         m.Questions.Add(new QuestionModel());
         Console.WriteLine(m.Questions.Count);
         return PartialView("TasksManager/_QuestionsList", m);
@@ -164,9 +265,9 @@ public class TasksManager : Controller
         string? token = HttpContext.Session.GetString("_UserToken");
         if (!String.IsNullOrEmpty(token))
         {
-            var UserId = _auth.GetUserAsync(token).Result.LocalId;
-            DocumentReference author = _db.Collection("Users").Document(UserId);
-            Query tasksQuery = _db.Collection("Tasks").WhereEqualTo("Author", author).OrderBy("Category");
+            var userId = _auth.GetUserAsync(token).Result.LocalId;
+            DocumentReference author = _db.Collection("Users").Document(userId);
+            Query tasksQuery = _db.Collection("Tasks").WhereEqualTo("AuthorReference", author).OrderBy("Category");
             if (_lastDoc != null)
             {
                 tasksQuery = tasksQuery.StartAfter(_lastDoc);

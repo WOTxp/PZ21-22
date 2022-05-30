@@ -1,4 +1,4 @@
-﻿@model Mathio.Models.TasksAllModel
+@model Mathio.Models.TasksModel
 @{
     ViewBag.Title = "title";
     Layout = "_Layout";
@@ -73,17 +73,15 @@ ul.answers{
 }
 </style>
 
-<form asp-action="AddTask" id="taskForm">
 <div class="catcher col-sm-12 margin-top-20">
-<div class="title"><h2>Tworzenie zadań</h2></div>
-
-    <div class="block-of-content">
-    
+    <div class="title"><h2>Tworzenie zadań</h2></div>
+    <form asp-action="AddTask" id="taskForm">
+        <div class="block-of-content">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group text-center field-group-extra">
-                <label asp-for="Task.Category" class="control-label hide display-none"></label>
+                <label asp-for="Category" class="control-label hide display-none"></label>
                 <h5 class="margin-top-10">Kategoria</h5>
-                <select asp-for="Task.Category" class="form-control field-extra">
+                <select asp-for="Category" class="form-control field-extra">
                     <option>Dodawanie i odejmowanie</option>
                     <option>Mnożenie i dzielenie</option>
                     <option>Potęgowanie</option>
@@ -97,39 +95,40 @@ ul.answers{
                     <option>Pochodne</option>
                     <option>Całki</option>
                 </select>
-                <span asp-validation-for="Task.Category" class="text-danger"></span>
+                <span asp-validation-for="Category" class="text-danger"></span>
             </div>
             <div class="form-group text-center field-group-extra">
-                <label asp-for="Task.Title" class="control-label hide display-none"></label>
+                <label asp-for="Title" class="control-label hide display-none"></label>
                 <h5 class="margin-top-10">Tytuł</h5>
-                <input asp-for="Task.Title" class="form-control field-extra" placeholder="Tytuł"/>
-                <span asp-validation-for="Task.Title" class="text-danger"></span>
+                <input asp-for="Title" class="form-control field-extra" placeholder="Tytuł"/>
+                <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group text-center field-group-extra">
-                <label asp-for="Task.Description" class="control-label hide dipslay-none"></label>
+                <label asp-for="Description" class="control-label hide dipslay-none"></label>
                 <h5 class="margin-top-10">Opis</h5>
-                <textarea asp-for="Task.Description" class="form-control field-extra" id="description"></textarea>
-                <span asp-validation-for="Task.Description" class="text-danger"></span>
+                <textarea asp-for="Description" class="form-control field-extra" id="description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-    </div>
-    <div id="control-buttons">
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="QuestionsPerTest" class="control-label hide dipslay-none"></label>
+                <input asp-for="QuestionsPerTest" class="form-control field-extra" placeholder="Opis"/>
+                <span asp-validation-for="QuestionsPerTest" class="text-danger"></span>
+            </div>
+        </div>
+        <div id="lessons">
+            @Html.EditorFor(m => m.Lessons)
+        </div>
         <button id="addLesson" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj lekcję</button>
+        <div id="questions">
+            @Html.EditorFor(m=>m.Questions)
+        </div>
         <button id="addQuestion" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj pytanie</button>
-        <input type="submit" value="Dodaj" class="btn btn-primary right dblock margin-top-10"/>
-    </div>
-</div>
-    <div id="lessons">
-        @Html.EditorFor(m => m.Lessons)
-    </div>
-    
-    <div id="questions">
-        @Html.EditorFor(m=>m.Questions)
-    </div>
-</form>
+        <div id="control-buttons">
+            <input type="submit" value="Dodaj" class="btn btn-primary right dblock margin-top-10"/>
+        </div>
+    </form>
+</div>       
 
-<div id="test">
-    
-</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
@@ -157,11 +156,20 @@ ul.answers{
                 }
             });
         });
+        
+        $("#lessons").on("click", ".del_lesson", function (){
+            $(this).parents(".lesson").attr("hidden",true);
+            $(this).parents(".lesson").find(".deleted").val("True");
+        });
+        
+        $("#questions").on("click", ".del_question", function (){
+            $(this).parents(".question").attr("hidden",true);
+            $(this).parents(".question").find(".deleted").val("True");
+        });
     </script>
 }
 
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
 <script>
     tinymce.init({
     language: 'pl',

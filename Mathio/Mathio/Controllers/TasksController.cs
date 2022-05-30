@@ -8,9 +8,10 @@ namespace Mathio.Controllers;
 
 public class TasksController : Controller
 {
-    private FirestoreDb _db;
+    private readonly FirestoreDb _db;
     private static DocumentSnapshot? _lastDoc;
-    private static TasksModel? _lastTask;
+    private static TasksModel? _openedTask;
+    private static TestManager? _testManager;
 
     public TasksController()
     {
@@ -20,6 +21,8 @@ public class TasksController : Controller
     // GET
     public IActionResult Index()
     {
+        _openedTask = null;
+        _testManager = null;
         _lastDoc = null;
         return View();
     }
@@ -37,7 +40,7 @@ public class TasksController : Controller
 
         QuerySnapshot snapshot = await tasksQuery.GetSnapshotAsync();
         List<TasksModel> tasks = new List<TasksModel>();
-        foreach (DocumentSnapshot document in snapshot.Documents)
+        foreach (var document in snapshot.Documents)
         {
             tasks.Add(document.ConvertTo<TasksModel>());
         }
@@ -45,48 +48,67 @@ public class TasksController : Controller
         _lastDoc = snapshot.Documents.Count > 0 ? snapshot.Documents.Last() : null;
         return tasks;
     }
-
-    public IActionResult Lessons(string id, int page=1)
+    //GET: /Tasks/ID/Lessons
+    [Route("Tasks/{id}/Lessons")]
+    public async Task<IActionResult> Lessons(string id, int page=1)
     {
-        DocumentReference t = _db.Collection("Tasks").Document(id);
-        TasksModel task = new TasksModel();
-        if (_lastTask != null && _lastTask.Id == id)
+        if (_openedTask?.SelfReference?.Id != id)
         {
-            task = _lastTask;
-        }
-        else
-        {
-            task = t.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
+            var taskDoc = await _db.Collection("Tasks").Document(id).GetSnapshotAsync();
+            _openedTask = taskDoc.ConvertTo<TasksModel>();
         }
 
-        var lessonDoc = _db.Collection("Tasks").Document(id).Collection("Lessons").WhereEqualTo("Page", page)
-            .GetSnapshotAsync().Result.Documents;
-        Console.WriteLine(lessonDoc.Count);
-        if (lessonDoc.Count > 0)
+        await _openedTask.GetLesson(page);
+        return View(_openedTask);
+    }
+    //GET: /Tasks/ID/Questions
+    [Route("Tasks/{id}/Questions")]
+    public async Task<IActionResult> Questions(string id, int num = 1)
+    {
+        if (_testManager ==null || _openedTask?.SelfReference?.Id != id)
         {
-            var lesson = lessonDoc[0].ConvertTo<LessonModel>();
-            return View(new Tuple<TasksModel,LessonModel>(task,lesson));
+            var taskDoc = await _db.Collection("Tasks").Document(id).GetSnapshotAsync();
+            _openedTask = taskDoc.ConvertTo<TasksModel>();
+            _testManager = new TestManager(_openedTask);
+            Console.WriteLine(_testManager.Task.SelfReference?.Id);
+            await _testManager.SetupTest();
         }
 
-        return RedirectToAction("Index", "Tasks");
-
+        _testManager.GetQuestion(num - 1);
+        TempData["num"] = num;
+        return View(_testManager);
     }
 
     public async Task<IActionResult> LoadMoreTasks(int batchSize = 2)
     {
-        List<TasksModel> tasksBatchAll = await GetTasksCategoryBatch(batchSize);
-        List<Tuple<TasksModel, UserModel>> tasks = new List<Tuple<TasksModel, UserModel>>();
-        foreach (TasksModel task in tasksBatchAll)
+        List<TasksModel> tasks = await GetTasksCategoryBatch(batchSize);
+        foreach (TasksModel task in tasks)
         {
-            UserModel author = new UserModel();
-            if(task.AuthorReference != null)
-                author = task.AuthorReference.GetSnapshotAsync().Result.ConvertTo<UserModel>();
-            tasks.Add(new Tuple<TasksModel, UserModel>(task, author));
+            await task.DownloadAuthor();
         }
 
         return PartialView("_TasksBatch", tasks);
     }
-    
+
+    [HttpPost]
+    public IActionResult SaveAnswer([Bind("QuestionId, Answer")]QuestionAnswerModel model)
+    {
+        Console.WriteLine("HI");
+        if (!ModelState.IsValid) return Json(new {success = false, msg = "No model!"});
+        Console.WriteLine("HI?");
+        Console.WriteLine(model.QuestionId+" "+model.Answer);
+        if (model.QuestionId == null) return Json(new {success = false, msg = "Wrong data!"});
+       
+        Console.WriteLine(model.QuestionId, model.Answer);
+        
+        if (_testManager == null) return Json(new {success = false, msg = "No Test Manager!"});
+        
+        if (_testManager.currentQuestion?.ID != model.QuestionId)
+            return Json(new {success = false, msg = "Something went wrong!"});
+
+        var saved = _testManager.SaveAnswer(model);
+        return Json(saved ? new {success=true, msg="Answer saved!"} : new {success = false, msg = "Something went wrong!"});
+    }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

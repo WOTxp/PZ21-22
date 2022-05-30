@@ -1,0 +1,67 @@
+﻿@model TestManager
+
+@{
+    Layout = "_Layout";
+}
+
+<div>
+    @Model.Task.Category
+    @Model.Task.Title
+    @Model.Task.Description
+    @Model.Task.Author?.UserName
+    @Model.Task.Author?.Points
+    @Model.Task.LastUpdate
+    
+    <p>Pytanie @TempData["num"]/@Model.Task.QuestionsPerTest</p>
+    @{
+        await Html.RenderPartialAsync("_Question", model: Model.currentQuestion);
+    }
+    @{
+        var num = (int) (TempData["num"] ?? 0);
+        if (num == 1)
+        {
+            <button id = "prev" disabled>Poprzedni</button>
+            <button id = "next">Nastepny</button>
+        }
+        else if (num == Model.Task.QuestionsPerTest)
+        {
+            <button id = "prev">Poprzedni</button>
+            <button id = "finish">Zakończ</button>
+            <button id = "next" disabled>Nastepny</button>
+        }
+        else if (num > 1 && num < Model.Task.QuestionsPerTest)
+        {
+            <button id = "prev">Poprzedni</button>
+            <button id = "next">Nastepny</button>
+        }
+        else
+        {
+            <button id = "return" onclick="location.href='@Url.Action("Questions" , "Tasks", new {id=Model.Task.SelfReference?.Id})'">Wróc</button>
+        }
+    }
+</div>
+<script type="text/javascript" defer>
+function SaveAnswer(){
+    let d = $("#AnswerForm").serialize();
+        $.ajax({
+            type: "POST",
+            url: '/Tasks/SaveAnswer',
+            dataType: 'json',
+            data: d,
+            success: function (response) {
+                alert(response["msg"]);
+            }
+        });
+}
+$("#prev").on("click", function () {
+  SaveAnswer();
+  location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 2)-1})'
+});
+$("#next").on("click", function () {
+    SaveAnswer();
+    location.href = '@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 0)+1})'
+});
+$("#finish").on("click", function () {
+    SaveAnswer();
+});
+</script>

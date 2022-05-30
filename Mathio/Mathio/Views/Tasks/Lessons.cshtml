@@ -1,4 +1,4 @@
-﻿@model Tuple<TasksModel, LessonModel>
+@model Mathio.Models.TasksModel
 
 @{
     Layout = "_Layout";
@@ -56,7 +56,6 @@ body{
 .margin-top-10{
     margin-top: 10px;
 }
-
 #lesson-content{
     padding: 10px;
     margin-left: 30px;
@@ -116,6 +115,7 @@ body{
 }
 </style>
 
+
 <div class="row">
     <div class="col-sm-0 col-md-1 p-0"></div>
     <div id="Task" class="margin-top-10 col-sm-12 col-md-10 p-0">
@@ -130,7 +130,7 @@ body{
             </div>
             <div class="width-50">
                 <div id="data-2">
-                    <b>@Model.CreatedAt</b><br/>
+                    <b>@Model.LastUpdate</b><br/>
                     Punkty do zdobycia: <b>@Model.Author?.Points</b>
                 </div>
             </div>
@@ -171,7 +171,7 @@ body{
         </div>
     </div>
     <div class="col-sm-0 col-md-1 p-0"></div>
-
 </div>
+
 
 
