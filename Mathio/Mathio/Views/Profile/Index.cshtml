@@ -1,4 +1,5 @@
-﻿@{
+﻿@model UserModel
+@{
     ViewData["Title"] = "My Profile";
 }
 
@@ -230,7 +231,7 @@ body{
                 <img class="profile-picture img-fluid" src="~/img/profilowe.jpg"/>
             </div>
             <div id="username">
-                <h2>ProjektNaTrzy</h2>
+                <h2>@Model.UserName</h2>
             </div>
             <div id="statistics">
                 <div class="box">
@@ -272,17 +273,37 @@ body{
             </div>
             <div id="data">
                 <table id="data-table">
-                   <tr><td class="field-1">Imię</td><td class="data-field-1">Damian</td></tr>
-                   <tr><td class="field-2">Nazwisko</td><td class="data-field-2">Abramek</td></tr>
-                    <tr><td class="field-1">E-mail</td><td class="data-field-1">Damian3333344@gmail.com</td></tr>
-                   <tr><td class="field-2">Opis</td><td class="data-field-2">Pasjonuję się wszystkim! szczególnie lubię robić różnego rodzaju projekty :)</td></tr>
+                    <tr><td class="field-1">Imię</td><td class="data-field-1">@Model.FirstName</td></tr>
+                    <tr><td class="field-2">Nazwisko</td><td class="data-field-2">@Model.LastName</td></tr>
+                    <tr><td class="field-1">E-mail</td><td class="data-field-1">@Model.Email</td></tr>
+                    <tr><td class="field-2">Opis</td><td class="data-field-2">@Model.Description</td></tr>
                 </table>
             </div>
-            <a href="/Profile/Settings/Index" class="normal-link">
+            <a href="/Profile/Settings" class="normal-link">
                 <div id="button-div-settings">
                     <h4>Zmień</h4>
                 </div>
             </a>
+            <div id="TasksStatus" class="onlyToPrint deleteLater">
+                @{
+                    if (@Model.TasksStatus == null || @Model.TasksStatus.Count == 0)
+                    {
+                        <h4>No opened tasks</h4>
+                    }
+                    else
+                    {
+                        foreach (var taskStatus in @Model.TasksStatus)
+                        {
+                            
+                            <p>
+                                Task: @taskStatus.Task?.Title, Category: @taskStatus.Task?.Category<br/>
+                                Autor: (@taskStatus.Task?.Author?.Type) @taskStatus.Task?.Author?.UserName<br/>
+                                Wynik: @taskStatus.TestScore/@taskStatus.Task?.QuestionsPerTask, Teoria: @taskStatus.CurrentPage/@taskStatus.Task?.NumPages
+                            </p>
+                        }
+                    }
+                }
+            </div>
         </div>
     </div>
 

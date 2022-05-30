@@ -3,14 +3,21 @@
     ViewData["Title"] = "TasksManager";
 }
 
-<div class="row">
-    Strona menadżera zadań.
+<div>
+    <div id="success">@TempData["success"]</div>
+    <button id="load" class="btn-dark">Załaduj</button>
+    <div id="tasks" class="row"></div>
 </div>
-<div class="row">
-    <div class="col-md-auto">
-        <a href="/TasksManager/AddTask" class="btn btn-primary" role="button">Dodaj</a>
-    </div>
-    <div class="col-md-auto">
-        <a href="/TasksManager/EditTask" class="btn btn-primary" role="button">Edytuj</a>
-    </div>
-</div>
+
+<script type="text/javascript" defer>
+$("#load").on("click", function () {
+    $.ajax({
+        type: "GET",
+        url: '@Url.Action("LoadMoreTasksM", "TasksManager", new { batchSize=2 })',
+        success: function (response) {
+            alert(response)
+            document.getElementById("tasks").innerHTML+=response;
+        }
+    });
+});
+</script>

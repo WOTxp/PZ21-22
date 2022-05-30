@@ -7,7 +7,7 @@
 <h2>Edit Task</h2>
 <form asp-action="EditTask" id="taskForm">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="Task.ID" hidden/>
+    <input asp-for="Task.Id" hidden/>
     <div class="form-group text-center field-group-extra">
         <label asp-for="Task.Category" class="control-label hide"></label>
         <input asp-for="Task.Category" class="form-control field-extra" placeholder="Kategoria"/>

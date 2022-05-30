@@ -50,7 +50,7 @@ public class TasksController : Controller
     {
         DocumentReference t = _db.Collection("Tasks").Document(id);
         TasksModel task = new TasksModel();
-        if (_lastTask != null && _lastTask.ID == id)
+        if (_lastTask != null && _lastTask.Id == id)
         {
             task = _lastTask;
         }
@@ -58,9 +58,18 @@ public class TasksController : Controller
         {
             task = t.GetSnapshotAsync().Result.ConvertTo<TasksModel>();
         }
-        LessonModel lesson = _db.Collection("Tasks").Document(id).Collection("Lessons").WhereEqualTo("Page", page)
-            .GetSnapshotAsync().Result.Documents[0].ConvertTo<LessonModel>();
-        return View(new Tuple<TasksModel,LessonModel>(task,lesson));
+
+        var lessonDoc = _db.Collection("Tasks").Document(id).Collection("Lessons").WhereEqualTo("Page", page)
+            .GetSnapshotAsync().Result.Documents;
+        Console.WriteLine(lessonDoc.Count);
+        if (lessonDoc.Count > 0)
+        {
+            var lesson = lessonDoc[0].ConvertTo<LessonModel>();
+            return View(new Tuple<TasksModel,LessonModel>(task,lesson));
+        }
+
+        return RedirectToAction("Index", "Tasks");
+
     }
 
     public async Task<IActionResult> LoadMoreTasks(int batchSize = 2)
@@ -70,8 +79,8 @@ public class TasksController : Controller
         foreach (TasksModel task in tasksBatchAll)
         {
             UserModel author = new UserModel();
-            if(task.Author != null)
-                author = task.Author.GetSnapshotAsync().Result.ConvertTo<UserModel>();
+            if(task.AuthorReference != null)
+                author = task.AuthorReference.GetSnapshotAsync().Result.ConvertTo<UserModel>();
             tasks.Add(new Tuple<TasksModel, UserModel>(task, author));
         }
 

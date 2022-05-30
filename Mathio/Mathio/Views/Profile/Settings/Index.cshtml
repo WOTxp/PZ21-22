@@ -1,4 +1,5 @@
-﻿@{
+﻿@model UserModel
+@{
     ViewData["Title"] = "Profile Settings";
 }
 
@@ -122,13 +123,37 @@ a:link{
     <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
 
     <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
-        <div class="catcher margin-top-20">
-            <div class="title">Ustawienia</div>
-            <div class="content">
-                <partial name="Settings/_UpdateProfile" model="Model"/>
-                <partial name="Settings/_ChangePassword" model="null"/>
-            </div>
-            <a href="/Profile" class="link"><div class="title extra cursor-pointer">Ucieczka</div></a>
+        <div class="content">
+            <form id="usernameForm" asp-antiforgery="true">
+                <label asp-for="UserName"></label>
+                <input class="form-control field-extra" asp-for="UserName" type="text"/>
+                <span class="text-danger" asp-validation-for="UserName"></span>
+                <button type="button" class="btn btn-primary" onclick="ChangeUserName()">Zmień nazwę użytkownika</button>
+                <br/>
+            </form>
+            <form id="firstNameForm" asp-antiforgery="true">
+                <label asp-for="FirstName"></label>
+                <input class="form-control field-extra" asp-for="FirstName" type="text"/>
+                <span class="text-danger" asp-validation-for="FirstName"></span>
+                <button type="button" class="btn btn-primary" onclick="ChangeFirstName()">Zmień imię</button>
+                <br/>
+            </form>
+            <form id="lastNameForm" asp-antiforgery="true">
+                <label asp-for="LastName"></label>
+                <input class="form-control field-extra" asp-for="LastName" type="text"/>
+                <span class="text-danger" asp-validation-for="LastName"></span>
+                <button type="button" class="btn btn-primary" onclick="ChangeLastName()">Zmień nazwisko</button>
+                <br/>
+            </form>
+            <form id="descritionForm" asp-antiforgery="true">
+                <label asp-for="Description"></label>
+                <input class="form-control field-extra" asp-for="Description" type="text"/>
+                <span class="text-danger" asp-validation-for="Description"></span>
+                <button type="button" class="btn btn-primary" onclick="ChangeDescription()">Zmień opis</button>
+                <br/>
+            </form>
+            <h4 id="success">@TempData["Success"]</h4>
+            <h4 id="error"></h4>
         </div>
     </div>
 
