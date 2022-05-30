@@ -1,48 +1,134 @@
-﻿@model Mathio.Models.TasksModel
+@model Mathio.Models.TasksModel
 @{
     ViewBag.Title = "title";
     Layout = "_Layout";
 }
 
-<h2>Add Task</h2>
-<p>@ViewData["error_msg"]</p>
-<form asp-action="AddTask" id="taskForm">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Category" class="control-label hide"></label>
-        <input asp-for="Category" class="form-control field-extra" placeholder="Kategoria"/>
-        <span asp-validation-for="Category" class="text-danger"></span>
-    </div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Title" class="control-label hide"></label>
-        <input asp-for="Title" class="form-control field-extra" placeholder="Tytuł"/>
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Description" class="control-label hide"></label>
-        <input asp-for="Description" class="form-control field-extra" placeholder="Opis"/>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="QuestionsPerTest" class="control-label hide"></label>
-        <input asp-for="QuestionsPerTest" class="form-control field-extra" placeholder="Opis"/>
-        <span asp-validation-for="QuestionsPerTest" class="text-danger"></span>
-    </div>
-    <h4>Lessons</h4>
-    <div id="lessons">
-        @Html.EditorFor(m => m.Lessons)
-    </div>
-    <button id="addLesson" type="button">Add Lesson</button>
-    <h4>Questions</h4>
-    <div id="questions">
-        @Html.EditorFor(m=>m.Questions)
-    </div>
-    <button id="addQuestion" type="button">Add Question</button>
-    <input type="submit" value="Dodaj" class="btn btn-primary submit-extra"/>
-</form>
-<div id="test">
-    
-</div>
+<style>
+body{
+    background-color: #EEE;
+}
+
+.block-of-content{
+    margin: 10px;
+    margin-top: 0px;
+    padding: 30px;
+    background-color: #FFF;
+    padding-bottom: 30px;
+}
+
+.title{
+    background-color: #088AFC;
+    text-align: center;
+    color: #FFF;
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top : 0px;
+}
+
+#control-buttons{
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    padding-bottom: 60px;
+    background-color: #FFF;
+}
+
+.left{
+    float: left;
+}
+
+.right{
+    float: right;
+}
+
+.margin-right-10{
+    margin-right: 10px;
+}
+
+.margin-top-10{
+    margin-top: 10px;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}
+
+.display-none{
+    display: none;
+}
+
+.dblock{
+    display: block;
+}
+
+ul.answers{
+    list-style-type: circle;
+}
+
+.catcher{
+    float: left;
+}
+</style>
+
+<div class="catcher col-sm-12 margin-top-20">
+    <div class="title"><h2>Tworzenie zadań</h2></div>
+    <form asp-action="AddTask" id="taskForm">
+        <div class="block-of-content">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="Category" class="control-label hide display-none"></label>
+                <h5 class="margin-top-10">Kategoria</h5>
+                <select asp-for="Category" class="form-control field-extra">
+                    <option>Dodawanie i odejmowanie</option>
+                    <option>Mnożenie i dzielenie</option>
+                    <option>Potęgowanie</option>
+                    <option>Pierwiastkowanie</option>
+                    <option>Funkcje liniowe</option>
+                    <option>= b^2 - 4ac</option>
+                    <option>Funkcje kwadratowe</option>
+                    <option>Figury geometryczne</option>
+                    <option>Liczby zespolone</option>
+                    <option>Granice</option>
+                    <option>Pochodne</option>
+                    <option>Całki</option>
+                </select>
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="Title" class="control-label hide display-none"></label>
+                <h5 class="margin-top-10">Tytuł</h5>
+                <input asp-for="Title" class="form-control field-extra" placeholder="Tytuł"/>
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="Description" class="control-label hide dipslay-none"></label>
+                <h5 class="margin-top-10">Opis</h5>
+                <textarea asp-for="Description" class="form-control field-extra" id="description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="QuestionsPerTest" class="control-label hide dipslay-none"></label>
+                <input asp-for="QuestionsPerTest" class="form-control field-extra" placeholder="Opis"/>
+                <span asp-validation-for="QuestionsPerTest" class="text-danger"></span>
+            </div>
+        </div>
+        <div id="lessons">
+            @Html.EditorFor(m => m.Lessons)
+        </div>
+        <button id="addLesson" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj lekcję</button>
+        <div id="questions">
+            @Html.EditorFor(m=>m.Questions)
+        </div>
+        <button id="addQuestion" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj pytanie</button>
+        <div id="control-buttons">
+            <input type="submit" value="Dodaj" class="btn btn-primary right dblock margin-top-10"/>
+        </div>
+    </form>
+</div>       
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
@@ -82,3 +168,19 @@
         });
     </script>
 }
+
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+    language: 'pl',
+    selector: '#description',
+    plugins: [
+        'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+        'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+        'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+    ],
+    toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+        'alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
+    });
+</script>

@@ -288,6 +288,7 @@ public class ProfileController : Controller
         var token = HttpContext.Session.GetString("_UserToken");
         if (string.IsNullOrEmpty(token))
         {
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
             errors["auth"].Add("Zaloguj się aby kontynuować");
             return Json(new {success = false, errors, data = settings.UserName});
         }
@@ -298,9 +299,16 @@ public class ProfileController : Controller
         }
         catch (FirebaseAuthException e)
         {
-            errors["auth"].Add(e.Reason == AuthErrorReason.InvalidIDToken
-                ? "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować"
-                : "Błąd. Zaloguj się aby kontynuować");
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
             return Json(new {success = false, errors, data = settings.UserName});
         }
 
@@ -322,6 +330,7 @@ public class ProfileController : Controller
         try
         {
             await _db.Collection("Users").Document(user.LocalId).UpdateAsync("UserName", settings.UserName);
+            TempData["Success"] = "Pomyślnie zmieniono nazwę użytkownika";
             return Json(new {success = true, data = settings.UserName});
         }
         catch (Grpc.Core.RpcException e)
@@ -344,6 +353,7 @@ public class ProfileController : Controller
         var token = HttpContext.Session.GetString("_UserToken");
         if (string.IsNullOrEmpty(token))
         {
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
             errors["auth"].Add("Zaloguj się aby kontynuować");
             return Json(new {success = false, errors, data = settings.FirstName});
         }
@@ -354,9 +364,16 @@ public class ProfileController : Controller
         }
         catch (FirebaseAuthException e)
         {
-            errors["auth"].Add(e.Reason == AuthErrorReason.InvalidIDToken
-                ? "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować"
-                : "Błąd. Zaloguj się aby kontynuować");
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
             return Json(new {success = false, errors, data = settings.FirstName});
         }
 
@@ -378,6 +395,7 @@ public class ProfileController : Controller
         try
         {
             await _db.Collection("Users").Document(user.LocalId).UpdateAsync("FirstName", settings.FirstName);
+            TempData["Success"] = "Pomyślnie zmieniono imię";
             return Json(new {success = true, data = settings.FirstName});
         }
         catch (Grpc.Core.RpcException e)
@@ -400,6 +418,7 @@ public class ProfileController : Controller
         var token = HttpContext.Session.GetString("_UserToken");
         if (string.IsNullOrEmpty(token))
         {
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
             errors["auth"].Add("Zaloguj się aby kontynuować");
             return Json(new {success = false, errors, data = settings.LastName});
         }
@@ -410,9 +429,16 @@ public class ProfileController : Controller
         }
         catch (FirebaseAuthException e)
         {
-            errors["auth"].Add(e.Reason == AuthErrorReason.InvalidIDToken
-                ? "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować"
-                : "Błąd. Zaloguj się aby kontynuować");
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
             return Json(new {success = false, errors, data = settings.LastName});
         }
         errors.Remove("auth");
@@ -433,6 +459,7 @@ public class ProfileController : Controller
         try
         {
             await _db.Collection("Users").Document(user.LocalId).UpdateAsync("LastName", settings.LastName);
+            TempData["Success"] = "Pomyślnie zmieniono nazwisko";
             return Json(new {success = true, data = settings.LastName});
         }
         catch (Grpc.Core.RpcException e)
@@ -455,6 +482,7 @@ public class ProfileController : Controller
         var token = HttpContext.Session.GetString("_UserToken");
         if (string.IsNullOrEmpty(token))
         {
+            TempData["msg"] = "Zaloguj sie aby kontynuować";
             errors["auth"].Add("Zaloguj się aby kontynuować");
             return Json(new {success = false, errors, data = settings.Description});
         }
@@ -465,9 +493,16 @@ public class ProfileController : Controller
         }
         catch (FirebaseAuthException e)
         {
-            errors["auth"].Add(e.Reason == AuthErrorReason.InvalidIDToken
-                ? "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować"
-                : "Błąd. Zaloguj się aby kontynuować");
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                errors["auth"].Add("Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować");
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            else
+            {
+                errors["auth"].Add("Błąd. Zaloguj się aby kontynuować");
+                TempData["msg"] = "Błąd. Zaloguj się aby kontynuować";
+            }
             return Json(new {success = false, errors, data = settings.Description});
         }
 
@@ -489,6 +524,7 @@ public class ProfileController : Controller
         try
         {
             await _db.Collection("Users").Document(user.LocalId).UpdateAsync("Description", settings.Description);
+            TempData["Success"] = "Pomyślnie zmieniono opis";
             return Json(new {success = true, data = settings.Description});
         }
         catch (Grpc.Core.RpcException e)
@@ -498,6 +534,44 @@ public class ProfileController : Controller
                 : "Błąd aktualizacji bazy danych");
             
             return Json(new {success = false, errors, data = settings.Description});
+        }
+    }
+    //GET: /Profile/History
+    public async Task<IActionResult> History()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby zobaczyć swoją historię";
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/History"});
+        }
+        
+        try
+        {
+            var user = await _auth.GetUserAsync(token);
+            var userDoc = await _db.Collection("Users").Document(user.LocalId).GetSnapshotAsync();
+            var userModel = userDoc.ConvertTo<UserModel>();
+            await userModel.DownloadTestsHistory();
+            //Add tests from history
+            if (userModel.TestsHistory == null) 
+                return View(userModel);
+            foreach (var historyTest in userModel.TestsHistory)
+            {
+                var task = await historyTest.DownloadTask();
+                if (task != null)
+                {
+                    await task.DownloadAuthor();
+                }
+            }
+            return View(userModel);
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby zobaczyć swoją historię";
+            }
+            return RedirectToAction("SignIn", routeValues: new{returnUrl="/Profile/History"});
         }
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

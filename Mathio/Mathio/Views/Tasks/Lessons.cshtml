@@ -1,43 +1,176 @@
-﻿@model Mathio.Models.TasksModel
+@model Mathio.Models.TasksModel
 
 @{
     Layout = "_Layout";
 }
 
+<style>
+body{
+    background-color: #EEE;
+}
 
-<div id="Task">
-    @Model.Category
-    @Model.Title
-    @Model.Description
-    @Model.Author?.UserName
-    @Model.Author?.Points
-    @Model.LastUpdate
-    <div id="Page">
-        @{
-            await Html.RenderPartialAsync("_Lesson", Model.currentLesson);
-        }
+#Task{
+    margin: auto;
+    margin-top: 10px;
+    width: 100%;
+    background-color: #FFF;
+    color: #222;
+    float: left; 
+}
+
+#title{
+    width: 100%;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    background-color: #088AFC;
+    color: #EEE;
+    text-align: center;
+    text-shadow: 0 0 1px #888;
+}
+
+.width-50{
+    width: 50%;
+    float: left;
+}
+
+.catcher{
+    width: 100%;
+}
+
+#data-1{
+    padding-left: 30px;
+    text-align:left;
+    float: left;
+    font-style: italic;
+    color: #444;
+}
+
+#data-2{
+    padding-right: 30px;
+    text-align: right;
+    float: right;
+    font-style: italic;
+    color: #444;
+}
+
+.margin-top-10{
+    margin-top: 10px;
+}
+#lesson-content{
+    padding: 10px;
+    margin-left: 30px;
+    margin-right: 30px;
+    width: 100%;
+    text-align: justify;
+}
+
+#buttons{
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.button-extra{
+    padding: 2px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra-off{
+    padding: 2px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 25px;
+    background-color: #FFF;
+    color: #222;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.margin-left-right-10{
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 100%;
+}
+
+#center-buttons{
+    width: auto;
+    margin: auto;
+}
+</style>
+
+
+<div class="row">
+    <div class="col-sm-0 col-md-1 p-0"></div>
+    <div id="Task" class="margin-top-10 col-sm-12 col-md-10 p-0">
+        <div id="title"><h2>@Model.Title</h2></div>
+        <div class="cather margin-top-10">
+            <div class="width-50">
+                <div id="data-1">
+                    Kategoria: <b>@Model.Category</b><br/>
+                    Autor: <b>@Model.Author?.UserName</b><br/>
+                    Opis: <b>@Model.Description</b>
+                </div>
+            </div>
+            <div class="width-50">
+                <div id="data-2">
+                    <b>@Model.LastUpdate</b><br/>
+                    Punkty do zdobycia: <b>@Model.Author?.Points</b>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+            <hr class="margin-left-right-10">
+        </div>
+        <div id="lesson-content">
+            <div id="Page">
+                @{
+                    await Html.RenderPartialAsync("_Lesson", Model.currentLesson);
+                }
+            </div>
+        </div>
+        <div style="clear:both" class="margin-top-10"></div>
+            <hr class="margin-left-right-10">
+        <div id="buttons">
+            <div id="center-buttons"><center>
+                @{
+                    if (Model.currentLesson?.Page <= 1)
+                    {
+                        <button id="prev" class="button-extra-off" disabled>Poprzednia strona</button>
+                    }
+                    else
+                    {
+                        <button id="prev" class="button-extra" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id = Model.SelfReference?.Id, page = @Model.currentLesson?.Page - 1})'">Poprzednia strona</button>
+                    }
+                    <button id="test" class="button-extra">Przejdź do testu</button>
+                    if (Model.currentLesson?.Page >= Model.NumPages)
+                    {
+                        <button id="next" class="button-extra-off" disabled>Następna strona</button>
+                    }
+                    else
+                    {
+                        <button id="next" class="button-extra" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id = Model.SelfReference?.Id, page = @Model.currentLesson?.Page + 1})'">Następna strona</button>
+                    }
+                }
+            </center></div>
+        </div>
     </div>
-    @{
-        if (Model.currentLesson?.Page <= 1)
-        {
-            <button id="prev" disabled>Poprzednia strona</button>
-        }
-        else
-        {
-            <button id="prev" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id = Model.SelfReference?.Id, page = @Model.currentLesson?.Page - 1})'">Poprzednia strona</button>
-        }
-        <button id="test">Przejdź do testu</button>
-        if (Model.currentLesson?.Page >= Model.NumPages)
-        {
-            <button id="next" disabled>Następna strona</button>
-        }
-        else
-        {
-            <button id="next" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id = Model.SelfReference?.Id, page = @Model.currentLesson?.Page + 1})'">Następna strona</button>
-        }
-    }
-    
-
+    <div class="col-sm-0 col-md-1 p-0"></div>
 </div>
 
 

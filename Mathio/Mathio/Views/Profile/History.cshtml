@@ -1,0 +1,20 @@
+﻿@model UserModel
+@{
+    ViewData["Title"] = "My Tests History";
+}
+
+<h1>@Model.UserName</h1>
+@{
+    if (Model.TestsHistory == null || Model.TestsHistory.Count == 0)
+    {
+        <h4>No finished tests</h4>
+        return;
+    }
+    foreach (var historyTest in Model.TestsHistory.Reverse())
+    {
+        <p>
+            Test from task: @historyTest.Task?.Title, Created By: @historyTest.Task?.Author?.UserName<br/>
+            Score: @historyTest.Score/@historyTest.Task?.QuestionsPerTask, Finished on: @historyTest.Date?.ToDateTime()
+        </p>
+    }
+}
