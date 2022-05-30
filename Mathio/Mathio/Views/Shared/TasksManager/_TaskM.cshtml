@@ -15,6 +15,13 @@
             <div class="description">
                 <p>@Model.Description</p>
             </div>
+            <div class="Author">
+                <div>@Model.Author?.UserName</div>
+                <div>@Model.Author?.Points</div>
+            </div>
+            <div>
+                Last update: @Model.LastUpdate?.ToDateTime()
+            </div>
         </div>
         <button id="edit" class="btn-info" onclick="location.href='@Url.Action("EditTask", "TasksManager", new {id = Model.SelfReference?.Id})'">Edit</button>
         <button id="delete" class="btn-danger" onclick="location.href='@Url.Action("DeleteTask", "TasksManager", new {id = Model.SelfReference?.Id})'">Delete</button>

@@ -32,8 +32,8 @@ public class TasksModel
     
     public LessonModel? currentLesson { get; set; }
     
-    public string SelfID { get; set; }
-    public string AuthorId { get; set; }
+    public string? SelfRefId { get; set; }
+    public string? AuthorRefId { get; set; }
     public async Task<UserModel?> DownloadAuthor()
     {
         if (AuthorReference == null) return null;

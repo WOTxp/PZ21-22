@@ -166,10 +166,10 @@ public class TasksManager : Controller
         if (string.IsNullOrEmpty(token))
         {
             TempData["msg"] = "Zaloguj się aby kontynuować";
-            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager/EditTask/"+task.SelfID});
+            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager"});
         }
-        task.SelfReference = _db.Collection("Tasks").Document(task.SelfID);
-        task.AuthorReference = _db.Collection("Users").Document(task.AuthorId);
+        task.SelfReference = _db.Collection("Tasks").Document(task.SelfRefId);
+        task.AuthorReference = _db.Collection("Users").Document(task.AuthorRefId);
         if (!ModelState.IsValid) return View(task);
         
         if (task.Lessons == null)
