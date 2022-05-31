@@ -219,6 +219,26 @@ body{
     transition-duration: 0.5s;
     transition-timing-function: linear;
 }
+
+.task-table{
+    margin: auto;
+    width: 80%;
+}
+
+#tasks-history{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #3A8CFF;
+    color: #FFFFFF;
+    margin: auto;
+    width: 100%;
+    font-size: 26px;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}
+
 </style>
 
 <div class="row">
@@ -284,25 +304,35 @@ body{
                     <h4>Zmień</h4>
                 </div>
             </a>
-            <div id="TasksStatus" class="onlyToPrint deleteLater">
+            <div style="clear:both"></div>
+    
+            <div class="content margin-top-20">
+                <div id="tasks-history"><h4>Ukończone testy</h4></div>
+                
                 @{
                     if (@Model.TasksStatus == null || @Model.TasksStatus.Count == 0)
                     {
-                        <h4>No opened tasks</h4>
+                        <h4 class="margin-top-20">No opened tasks</h4>
                     }
                     else
                     {
                         foreach (var taskStatus in @Model.TasksStatus)
                         {
-                            
-                            <p>
-                                Task: @taskStatus.Task?.Title, Category: @taskStatus.Task?.Category<br/>
-                                Autor: (@taskStatus.Task?.Author?.Type) @taskStatus.Task?.Author?.UserName<br/>
-                                Wynik: @taskStatus.TestScore/@taskStatus.Task?.QuestionsPerTest, Teoria: @taskStatus.CurrentPage/@taskStatus.Task?.NumPages
-                            </p>
+                           <table class="task-table margin-top-20">
+                                <tr><td class="field-1">Test</td><td class="data-field-1">@taskStatus.Task?.Title</td></tr>
+                                <tr><td class="field-2">Kategoria</td><td class="data-field-2">@taskStatus.Task?.Category</td></tr>
+                                <tr><td class="field-1">Autor</td><td class="data-field-1">@taskStatus.Task?.Author?.UserName</td></tr>
+                                <tr><td class="field-2">Teoria</td><td class="data-field-2">@taskStatus.TestScore/@taskStatus.Task?.QuestionsPerTest</td></tr>
+                                <tr><td class="field-1">Praktyka</td><td class="data-field-1">@taskStatus.CurrentPage/@taskStatus.Task?.NumPages</td></tr>
+                            </table> 
                         }
                     }
                 }
+               <a href="/Profile/History" class="normal-link">
+                    <div id="button-div-settings">
+                        <h4>Sprawdz</h4>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
