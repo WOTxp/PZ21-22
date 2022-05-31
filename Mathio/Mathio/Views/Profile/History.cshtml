@@ -60,8 +60,8 @@ body{
 }
 
 .data-table{
-    margin: auto;
-    width: 90%;;
+    margin: auto
+    width: 90%;
 }
 
 .content{
@@ -75,13 +75,16 @@ body{
     text-align: center;
 }
 
-.title{
+.button{
     background-color: #088AFC;
     padding: 14px;
     color: #FFFFFF;
     text-align: center;
-    width: 100%;
-    font-size: 24px;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 25px;
+    font-size: 18px;
     transition-duration: 0.5s;
     transition-timing-function: linear;
 }
@@ -90,7 +93,7 @@ body{
     cursor: pointer;
 }
 
-#extra:hover{
+.extra:hover{
     background-color: #3082F4;
     color: #EEEEEE;
     transition-duration: 0.5s;
@@ -104,11 +107,8 @@ a:link{
 
 <div class="row">
 
-    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
 
-    <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-        <div class="title margin-top-20">@Model.UserName</div>
-        <div class="content">
+        
     
 
         @{
@@ -119,20 +119,20 @@ a:link{
             }
             foreach (var historyTest in Model.TestsHistory.Reverse())
             {
-
-                <center><table class="test-table margin-top-20">
+            
+            <div class="test-history margin-top-20 col-sm-12 col-md-6 col-lg-4">
+                <table class="test-table">
                     <tr><td class="field-1">Test</td><td class="data-field-1">@historyTest.Task?.Title</td></tr>
                     <tr><td class="field-2">Autor</td><td class="data-field-2">@historyTest.Task?.Author?.UserName</td></tr>
                     <tr><td class="field-1">Wynik</td><td class="data-field-1">@historyTest.Score/@historyTest.Task?.QuestionsPerTest</td></tr>
                     <tr><td class="field-2">Zakonczono</td><td class="data-field-2">@historyTest.Date?.ToDateTime()</td></tr>
-                </table></center>
+                </table>
+            </div>
             }
         }
 
-        </div>
-        <a href="/Profile" class="link"><div class="title extra cursor-pointer">Ucieczka</div></a>
-    </div>
+       
+        <center><a href="/Profile" class="link"><div class="button extra cursor-pointer margin-top-20">Ucieczka</div></a></center>
 
-    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
 
 </div>
