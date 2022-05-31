@@ -7,21 +7,32 @@ body{
     background-color: #EEEEEE;
 }
 
-.one-category{
-    margin:auto;
-    width: 100%;
-    text-align: justify;
-}
-
-.category{
+.one-test{
     margin: auto;
     margin-top: 30px;
+    width: 100%;
+    text-align: justify;
+    border: 4px solid #FFF;
+    cursor: pointer;
+    transition-duration: 1s;
+    transition-timing-function: linear;
+}
+
+.one-test:hover{
+    border-color: #088AFC;
+    transition-duration: 1s;
+    transition-timing-function: linear;
+}
+
+.test-title{
+    margin: auto;
     background-color: #FFFFFF;
     width: 100%;
     padding-top: 10px;
     padding-bottom: 5px;
     padding-left: 20px;
     padding-right: 20px;
+    text-align: center;
 }
 
 .title-and-description{
@@ -42,12 +53,40 @@ body{
     margin:auto;
     width: 100%;
 }
+
+.informations{
+    width: 100%;
+    text-align: left;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.button-extra{
+    margin-top: 30px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.button-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
 </style>
 
 <div id="data" class="w-100 h-25">
-    <h1>Testy</h1>
-    <button class="btn" id="load">Zaladuj</button>
     <div id="tasks" class="row"></div>
+    <center><button class="btn primary-button button-extra" id="load">Więcej</button></center>
 </div>
 
 <script type="text/javascript" defer>

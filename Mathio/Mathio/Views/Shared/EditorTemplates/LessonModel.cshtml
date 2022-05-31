@@ -1,13 +1,9 @@
 @model Mathio.Models.LessonModel
 
 <div class="lesson" hidden="@Model.Deleted">
-    <div class="catcher  col-sm-6 margin-top-20">
+    <div class="catcher margin-top-20">
         <div class="title"><h4>Lekcja</h4></div>
         <div class="block-of-content">
-            <button class="del_lesson" type="button">Usuń</button>
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @Html.HiddenFor(m => m.ID)
-            @Html.HiddenFor(m => m.Deleted, new { @class="deleted" })
             <div class="form-group text-center field-group-extra">
                 <h5>Strona</h5>
                 <label asp-for="Page" class="control-label hide display-none"></label>
@@ -20,6 +16,10 @@
                 <input asp-for="Content" class="form-control field-extra" placeholder="Zawartość"/>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
+            <center><button class="del_lesson button-primary button-extra margin-top-10" type="button">Usuń</button></center>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(m => m.ID)
+            @Html.HiddenFor(m => m.Deleted, new { @class="deleted" })
         </div>
     </div>
 </div>

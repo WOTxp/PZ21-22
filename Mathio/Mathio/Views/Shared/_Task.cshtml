@@ -1,26 +1,22 @@
 ﻿@model Mathio.Models.TasksModel
 
 <div class="col-sm-12 col-lg-6 col-xxl-4 d-flex" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id=Model.SelfReference?.Id})'">
-    <div class="one-category">
-        <div class="category">
-            <h2>@Model.Category</h2>
+    <div class="one-test">
+        <div class="test-title">
+            <h4>@Model.Title</h4>
         </div>
         <div class="title-and-description">
-            <div class="title">
-                <h3>@Model.Title</h3>
-            </div>
-        
-            <hr>
-
+            
             <div class="description">
                 <p>@Model.Description</p>
             </div>
-            <div class="Author">
-                <div>@Model.Author?.UserName</div>
-                <div>@Model.Author?.Points</div>
-            </div>
-            <div>
-                @Model.LastUpdate?.ToDateTime()
+
+            <hr>
+
+            <div class="informations">
+                <b>Autor:</b> <i>@Model.Author?.UserName (@Model.Author?.Points pkt)</i><br/>
+                <b>Kategoria:</b> <i>@Model.Category</i><br/>
+                <b>Aktualizowano:</b> <i>@Model.LastUpdate?.ToDateTime()</i>
             </div>
         </div>
     </div>

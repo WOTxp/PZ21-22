@@ -3,18 +3,136 @@
     ViewData["Title"] = "My Tests History";
 }
 
-<h1>@Model.UserName</h1>
-@{
-    if (Model.TestsHistory == null || Model.TestsHistory.Count == 0)
-    {
-        <h4>No finished tests</h4>
-        return;
-    }
-    foreach (var historyTest in Model.TestsHistory.Reverse())
-    {
-        <p>
-            Test from task: @historyTest.Task?.Title, Created By: @historyTest.Task?.Author?.UserName<br/>
-            Score: @historyTest.Score/@historyTest.Task?.QuestionsPerTest, Finished on: @historyTest.Date?.ToDateTime()
-        </p>
-    }
+<style>
+
+body{
+    background-color: #EEE;
 }
+
+.field-1{
+    text-align: center;
+    font-weight: bold;
+    background-color: #3A8CFF;
+    color: #FFFFFF;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.data-field-1{
+    color: #555;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    font-style: italic;
+    background-color: #F3F3F3;
+    font-weight: bold;
+}
+
+.field-2{
+    text-align: center;
+    font-weight: bold;
+    background-color: #3486F8;
+    color: #FFFFFF;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.data-field-2{
+    color: #555;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    font-style: italic;
+    background-color: #E8E8E8;
+    font-weight: bold;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}
+
+.data-table{
+    margin: auto;
+    width: 90%;;
+}
+
+.content{
+    margin: auto;
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    widht: 100%;
+    text-align: center;
+}
+
+.title{
+    background-color: #088AFC;
+    padding: 14px;
+    color: #FFFFFF;
+    text-align: center;
+    width: 100%;
+    font-size: 24px;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+#extra:hover{
+    background-color: #3082F4;
+    color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+a:link{
+    text-decoration: none;
+}
+</style>
+
+<div class="row">
+
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+        <div class="title margin-top-20">@Model.UserName</div>
+        <div class="content">
+    
+
+        @{
+            if (Model.TestsHistory == null || Model.TestsHistory.Count == 0)
+            {
+                <h4>No finished tests</h4>
+                return;
+            }
+            foreach (var historyTest in Model.TestsHistory.Reverse())
+            {
+
+                <center><table class="test-table margin-top-20">
+                    <tr><td class="field-1">Test</td><td class="data-field-1">@historyTest.Task?.Title</td></tr>
+                    <tr><td class="field-2">Autor</td><td class="data-field-2">@historyTest.Task?.Author?.UserName</td></tr>
+                    <tr><td class="field-1">Wynik</td><td class="data-field-1">@historyTest.Score/@historyTest.Task?.QuestionsPerTest</td></tr>
+                    <tr><td class="field-2">Zakonczono</td><td class="data-field-2">@historyTest.Date?.ToDateTime()</td></tr>
+                </table></center>
+            }
+        }
+
+        </div>
+        <a href="/Profile" class="link"><div class="title extra cursor-pointer">Ucieczka</div></a>
+    </div>
+
+    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+
+</div>

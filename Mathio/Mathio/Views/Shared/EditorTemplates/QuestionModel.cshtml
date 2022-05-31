@@ -1,13 +1,9 @@
 @model Mathio.Models.QuestionModel
 
 <div class="question" hidden="@Model.Deleted">
-    <div class="catcher  col-sm-6 margin-top-20">
+    <div class="catcher margin-top-20">
         <div class="title"><h4>Pytanie</h4></div>
         <div class="block-of-content">
-            <button class="del_question" type="button">Usuń</button>
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @Html.HiddenFor(m => m.ID)
-            @Html.HiddenFor(m => m.Deleted, new { @class="deleted" })
             <div class="form-group text-center field-group-extra">
                 <h5 class="margin-top-10">Typ pytania</h5>
                 <label asp-for="Type" class="control-label hide display-none"></label>
@@ -62,6 +58,10 @@
                 <input asp-for="CorrectAnswer" class="form-control field-extra" placeholder="Prawidłowa odpowiedź"/>
                 <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
             </div>
+            <center><button class="del_question button-primary button-extra margin-top-10" type="button">Usuń</button></center>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(m => m.ID)
+            @Html.HiddenFor(m => m.Deleted, new { @class="deleted" })
         </div>
     </div>
 </div>

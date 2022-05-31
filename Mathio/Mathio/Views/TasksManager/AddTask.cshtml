@@ -71,6 +71,28 @@ ul.answers{
 .catcher{
     float: left;
 }
+
+.button-extra{
+    margin-top: 30px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.button-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
 </style>
 
 <div class="catcher col-sm-12 margin-top-20">
@@ -119,15 +141,15 @@ ul.answers{
             <div id="lessons">
                 @Html.EditorFor(m => m.Lessons)
             </div>
-            <button id="addLesson" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj lekcję</button>
+            <center><button id="addLesson" type="button" class="btn btn-primary button-extra margin-top-20">Dodaj lekcję</button></center>
         </div>
         <div class="questions_block catcher">
             <div id="questions">
                 @Html.EditorFor(m=>m.Questions)
             </div>
-            <button id="addQuestion" type="button" class="btn btn-primary left dblock margin-right-10">Dodaj pytanie</button>
+            <center><button id="addQuestion" type="button" class="btn btn-primary button-extra margin-top-20">Dodaj pytanie</button></center>
         </div>
-        <input type="submit" value="Dodaj" class="btn btn-primary right dblock margin-top-10"/>
+        <center><input type="submit" value="Dodaj" class="btn btn-primary button-extra margin-top-20"/></center>
     </form>
 </div>      
 

@@ -16,6 +16,7 @@ body{
     padding-top: 20px;
     padding-bottom: 20px;
     widht: 100%;
+    text-align: center;
 }
 
 .field-extra{
@@ -26,7 +27,7 @@ body{
     text-align: center;
 }
 
-.submit-extra{
+.button-extra{
     width: 100%;
     margin-top: 20px;
     border-radius: 25px;
@@ -39,31 +40,11 @@ body{
     padding-bottom: 5px;
 }
 
-.submit-extra:hover{
+.button-extra:hover{
     background-color: #0872FC;
     color: #FFFFFF;
     border: 2px #086AFC solid;
     text-shadow: 0 0 0.5px #EEEEEE;
-    transition-duration: 0.5s;
-    transition-timing-function: linear;
-}
-
-.button-extra{
-    width: 100%;
-    margin-top: 20px;
-    border-radius: 25px;
-    background-color: #FFFFFF;
-    color: #222222;
-    border: 2px #E0E0E0 solid;
-    transition-duration: 0.5s;
-    transition-timing-function: linear;
-}
-
-.button-extra:hover{
-    background-color: #F0F0F0;
-    color: #222222;
-    border: 2px #CCCCCC solid;
-    text-shadow: 0 0 0.5px #888888;
     transition-duration: 0.5s;
     transition-timing-function: linear;
 }
@@ -116,48 +97,62 @@ body{
 a:link{
     text-decoration: none;
 }
+
+.margin-top-10{
+    margin-top: 10px;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}
 </style>
 
 <div class="row">
 
-    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+    <div class="col-0 col-sm-2 col-md-3 col-xl-4"></div>
 
-    <div class="col-12 col-sm-8 col-md-6 col-lg-4 d-flex">
+    <div class="col-12 col-sm-8 col-md-6 col-xl-4">
+        <div class="title margin-top-20">Ustawienia</div>
         <div class="content">
             <form id="usernameForm" asp-antiforgery="true">
-                <label asp-for="UserName"></label>
+                <label asp-for="UserName" class="hide"></label>
+                <center><h5 class="margin-top-10">Nazwa użytkownika</h5></center>
                 <input class="form-control field-extra" asp-for="UserName" type="text"/>
                 <span class="text-danger" asp-validation-for="UserName"></span>
-                <button type="button" class="btn btn-primary" onclick="ChangeUserName()">Zmień nazwę użytkownika</button>
+                <button type="button" class="btn btn-primary button-extra" onclick="ChangeUserName()">Zmień</button>
                 <br/>
-            </form>
+            </form><hr class="margin-top-20">
             <form id="firstNameForm" asp-antiforgery="true">
-                <label asp-for="FirstName"></label>
+                <label asp-for="FirstName" class="hide"></label>
+                <center><h5 class="margin-top-10">Imię</h5></center>
                 <input class="form-control field-extra" asp-for="FirstName" type="text"/>
                 <span class="text-danger" asp-validation-for="FirstName"></span>
-                <button type="button" class="btn btn-primary" onclick="ChangeFirstName()">Zmień imię</button>
+                <button type="button" class="btn btn-primary button-extra" onclick="ChangeFirstName()">Zmień</button>
                 <br/>
-            </form>
+            </form><hr class="margin-top-20">
             <form id="lastNameForm" asp-antiforgery="true">
-                <label asp-for="LastName"></label>
+                <label asp-for="LastName" class="hide"></label>
+                <center><h5 class="margin-top-10">Nazwisko</h5></center>
                 <input class="form-control field-extra" asp-for="LastName" type="text"/>
                 <span class="text-danger" asp-validation-for="LastName"></span>
-                <button type="button" class="btn btn-primary" onclick="ChangeLastName()">Zmień nazwisko</button>
+                <button type="button" class="btn btn-primary button-extra" onclick="ChangeLastName()">Zmień</button>
                 <br/>
-            </form>
+            </form><hr class="margin-top-20">
             <form id="descritionForm" asp-antiforgery="true">
-                <label asp-for="Description"></label>
+                <label asp-for="Description" class="hide"></label>
+                <center><h5 class="margin-top-10">Opis</h5></center>
                 <input class="form-control field-extra" asp-for="Description" type="text"/>
                 <span class="text-danger" asp-validation-for="Description"></span>
-                <button type="button" class="btn btn-primary" onclick="ChangeDescription()">Zmień opis</button>
+                <button type="button" class="btn btn-primary button-extra" onclick="ChangeDescription()">Zmień</button>
                 <br/>
             </form>
-            <h4 id="success">@TempData["Success"]</h4>
-            <h4 id="error"></h4>
+            <h5 id="success" class="text-success margin-top-20">@TempData["Success"]</h5>
+            <h5 id="error" class="text-danger margin-top-20"></h5>
         </div>
+        <a href="/Profile" class="link"><div class="title extra cursor-pointer">Ucieczka</div></a>
     </div>
 
-    <div class="col-0 col-sm-2 col-md-3 col-lg-4"></div>
+    <div class="col-0 col-sm-2 col-md-3 col-xl-4"></div>
 
 </div>
 
