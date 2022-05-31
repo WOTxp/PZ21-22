@@ -23,7 +23,7 @@ body{
     padding-top: 20px;
     padding-bottom: 10px;
     background-color: #088AFC;
-    color: #EEE;
+    color: #FFF;
     text-align: center;
     text-shadow: 0 0 1px #888;
 }
@@ -56,6 +56,7 @@ body{
 .margin-top-10{
     margin-top: 10px;
 }
+
 #lesson-content{
     padding: 10px;
     margin-left: 30px;
@@ -130,7 +131,7 @@ body{
             </div>
             <div class="width-50">
                 <div id="data-2">
-                    <b>Ostatnia aktualizacja: @Model.LastUpdate?.ToDateTime()</b><br/>
+                    Ostatnia aktualizacja: <b>@Model.LastUpdate?.ToDateTime()</b><br/>
                     Punkty do zdobycia: <b>@Model.QuestionsPerTest</b><br/>
                     Strona: <b>@Model.currentLesson?.Page</b>
                 </div>
