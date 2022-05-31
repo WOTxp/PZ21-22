@@ -158,7 +158,7 @@ body{
                     {
                         <button id="prev" class="button-extra" onclick="location.href='@Url.Action("Lessons", "Tasks", new {id = Model.SelfReference?.Id, page = @Model.currentLesson?.Page - 1})'">Poprzednia strona</button>
                     }
-                    <button id="test" class="button-extra">Przejdź do testu</button>
+                    <button id="test" class="button-extra" onclick="location.href='@Url.Action("Questions","Tasks",new {id=Model.SelfReference?.Id})'">Przejdź do testu</button>
                     if (Model.currentLesson?.Page >= Model.NumPages)
                     {
                         <button id="next" class="button-extra-off" disabled>Następna strona</button>
