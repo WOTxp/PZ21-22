@@ -1,13 +1,13 @@
 ﻿@model Mathio.Models.TasksModel
 
-<div class="col-sm-12 col-lg-6 col-xxl-4 d-flex">
-    <div class="one-category">
+<div class="col-sm-12 col-lg-6 col-xxl-4 d-flex border border-primary w-25 justify-content-between" style="height: 250px; text-align: center; border-radius: 20px;">
+    <div class="one-category" >
         <div class="category">
             <h2>@Model.Category</h2>
         </div>
         <div class="title-and-description">
             <div class="title">
-                <h3>@Model.Title</h3>
+                <h4>@Model.Title</h4>
             </div>
         
             <hr>
@@ -23,7 +23,16 @@
                 Last update: @Model.LastUpdate?.ToDateTime()
             </div>
         </div>
-        <button id="edit" class="btn-info" onclick="location.href='@Url.Action("EditTask", "TasksManager", new {id = Model.SelfReference?.Id})'">Edit</button>
-        <button id="delete" class="btn-danger" onclick="location.href='@Url.Action("DeleteTask", "TasksManager", new {id = Model.SelfReference?.Id})'">Delete</button>
+        <div class="row justify-content-around pt-4">
+            <div class="col-md-auto">
+                <button id="edit" class="btn btn-primary" onclick="location.href='@Url.Action("EditTask", "TasksManager", new {id = Model.SelfReference?.Id})'">Edytuj</button>
+            </div>
+            <div class="col-md-auto">
+                <button id="delete" class="btn btn-danger" onclick="location.href='@Url.Action("DeleteTask", "TasksManager", new {id = Model.SelfReference?.Id})'">Usuń</button>
+            </div>
+        </div>
     </div>
+</div>
+<div style="height: 20px;">
+    
 </div>

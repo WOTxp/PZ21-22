@@ -20,23 +20,32 @@
         var num = (int) (TempData["num"] ?? 0);
         if (num == 1)
         {
-            <button id = "prev" disabled>Poprzedni</button>
-            <button id = "next">Nastepny</button>
+            <div class="pt-3">
+                <button type="button" class="btn btn-primary" id = "prev" disabled>Poprzedni</button>
+                <button type="button" class="btn btn-primary" id = "next">Nastepny</button>
+            </div>
         }
         else if (num == Model.Task.QuestionsPerTest)
         {
-            <button id = "prev">Poprzedni</button>
-            <button id = "finish">Zakończ</button>
-            <button id = "next" disabled>Nastepny</button>
+            <div class="pt-3">
+                <button type="button" class="btn btn-primary" id = "prev">Poprzedni</button>
+                <button type="button" class="btn btn-primary" id = "finish">Zakończ</button>
+                <button type="button" class="btn btn-primary" id = "next" disabled>Nastepny</button>
+            </div>
+            
         }
         else if (num > 1 && num < Model.Task.QuestionsPerTest)
         {
-            <button id = "prev">Poprzedni</button>
-            <button id = "next">Nastepny</button>
+            <div class="pt-3">
+                <button type="button" class="btn btn-primary" id = "prev">Poprzedni</button>
+                <button type="button" class="btn btn-primary" id = "next">Nastepny</button>
+            </div>
         }
         else
         {
-            <button id = "return" onclick="location.href='@Url.Action("Questions" , "Tasks", new {id=Model.Task.SelfReference?.Id})'">Wróc</button>
+            <div class="pt-3">
+                <button type="button" class="btn btn-primary" id = "return" onclick="location.href='@Url.Action("Questions" , "Tasks", new {id=Model.Task.SelfReference?.Id})'">Wróc</button>
+            </div>
         }
     }
 </div>
