@@ -8,8 +8,8 @@
 <p>@ViewData["error_msg"]</p>
 <form asp-action="EditTask" id="taskForm">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input name="SelfRefId" value="@Model.SelfReference.Id" hidden/>
-    <input name="AuthorRefId" value="@Model.AuthorReference.Id" hidden/>
+    <input name="SelfRefId" value="@Model.SelfReference?.Id" hidden/>
+    <input name="AuthorRefId" value="@Model.AuthorReference?.Id" hidden/>
     <div class="form-group text-center field-group-extra">
         <label asp-for="Category" class="control-label hide"></label>
         <input asp-for="Category" class="form-control field-extra" placeholder="Kategoria"/>
@@ -58,6 +58,14 @@
                 success: function (response) {
                     alert(response);
                     $("#lessons").html(response);
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl="+location.href);
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });
@@ -70,6 +78,14 @@
                 success: function (response) {
                     alert(response)
                     $("#questions").html(response);
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl="+location.href);
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });

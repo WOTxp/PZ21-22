@@ -22,6 +22,14 @@ $("#confirm").on("click", function () {
                 alert("UDALO SIE!");
                 location.replace("@Url.Action("Index", "TasksManager")");
             }
+        },
+        error: function (xhr){
+            if (xhr.status===401){
+                location.replace("/Profile/SignIn?returnUrl="+location.href);
+            }
+            else {
+                alert(xhr.status);
+            }
         }
     });
 });

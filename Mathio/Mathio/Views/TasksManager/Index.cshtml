@@ -30,6 +30,14 @@ $("#load").on("click", function () {
         success: function (response) {
             alert(response)
             document.getElementById("tasks").innerHTML+=response;
+        },
+        error: function (xhr){
+            if (xhr.status===401){
+                location.replace("/Profile/SignIn?returnUrl=/TasksManager");
+            }
+            else {
+                alert(xhr.status);
+            }
         }
     });
 });

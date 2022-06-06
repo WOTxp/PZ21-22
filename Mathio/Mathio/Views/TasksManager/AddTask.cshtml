@@ -165,6 +165,14 @@ ul.answers{
                 success: function (response) {
                     alert(response);
                     $("#lessons").html(response);
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl=/TasksManager/AddTask");
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });
@@ -177,6 +185,14 @@ ul.answers{
                 success: function (response) {
                     alert(response)
                     $("#questions").html(response);
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl=/TasksManager/AddTask");
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });

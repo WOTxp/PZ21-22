@@ -3,16 +3,14 @@ using Firebase.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Google.Cloud.Firestore;
-using Newtonsoft.Json;
-
 
 namespace Mathio.Controllers;
 
 
 public class TasksManager : Controller
 {
-    private FirebaseAuthProvider _auth;
-    private FirestoreDb _db;
+    private readonly FirebaseAuthProvider _auth;
+    private readonly FirestoreDb _db;
     private static DocumentSnapshot? _lastDoc;
     public TasksManager()
     {
@@ -20,20 +18,24 @@ public class TasksManager : Controller
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
         _db = FirestoreDb.Create("pz202122-cf12f");
     }
-    // GET
-    public IActionResult Index()
+    //GET: /TasksManager
+    public async Task<IActionResult> Index()
     {
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/TasksManager"});
+        }
         _lastDoc = null;
         return View();
     }
-    
-    public IActionResult AddTask()
+    //GET: /TasksManager/AddTask
+    public async Task<IActionResult> AddTask()
     {
-        var token = HttpContext.Session.GetString("_UserToken");
-        if (string.IsNullOrEmpty(token))
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
         {
-            TempData["msg"] = "Zaloguj się aby kontynuować";
-            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager/AddTask"});
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/TasksManager/AddTask"});
         }
         return View();
     }
@@ -41,12 +43,14 @@ public class TasksManager : Controller
     [HttpPost]
     public async Task<IActionResult> AddTask(TasksModel newTask)
     {
-        var token = HttpContext.Session.GetString("_UserToken");
-        if (string.IsNullOrEmpty(token))
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
         {
-            TempData["msg"] = "Zaloguj się aby kontynuować";
-            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager/AddTask"});
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/TasksManager/AddTask"});
         }
+        var user = await _auth.GetUserAsync(HttpContext.Session.GetString("_UserToken"));
+        var authorRef = _db.Collection("Users").Document(user.LocalId);
+        
         if (!ModelState.IsValid) return View(newTask);
         
         if (newTask.Lessons == null)
@@ -72,9 +76,6 @@ public class TasksManager : Controller
             ViewData["error_msg"] = "Za mało pytań, musi być minimalnie " + newTask.QuestionsPerTest + "!";
             return View(newTask);
         }
-        
-        var user = await _auth.GetUserAsync(token);
-        var authorRef = _db.Collection("Users").Document(user.LocalId);
         newTask.AuthorReference = authorRef;
         newTask.NumPages = lessonsCount;
         newTask.LastUpdate = Timestamp.GetCurrentTimestamp();
@@ -93,34 +94,30 @@ public class TasksManager : Controller
             
         return RedirectToAction("Index");
     }
-    
+    //GET: /TasksManager/DeleteTask
     public async Task<IActionResult> DeleteTask(string id)
     {
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/TasksManager/DeleteTask/"+id});
+        }
         if (!ModelState.IsValid)
             return RedirectToAction("Index", "TasksManager");
         var taskDoc = await _db.Collection("Tasks").Document(path: id).GetSnapshotAsync();
         var task = taskDoc.ConvertTo<TasksModel>();
         return View(task);
     }
-    
-    private async Task DeleteCollection(CollectionReference collectionReference, int batchSize){
-        QuerySnapshot snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
-        IReadOnlyList<DocumentSnapshot> documents = snapshot.Documents;
-        while (documents.Count > 0)
-        {
-            foreach (DocumentSnapshot document in documents)
-            {
-                await document.Reference.DeleteAsync();
-            }
-            snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
-            documents = snapshot.Documents;
-        }
-    }
+    //DELETE: /TasksManager/DeleteTaskAll
     [HttpDelete]
     public async Task<IActionResult> DeleteTaskAll(string id)
     {
-        Console.WriteLine(id);
-        DocumentReference task = _db.Collection("Tasks").Document(path: id);
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return Unauthorized();
+        }
+        var task = _db.Collection("Tasks").Document(path: id);
         var collections =  task.ListCollectionsAsync().GetAsyncEnumerator();
         try
         {
@@ -135,21 +132,21 @@ public class TasksManager : Controller
         }
 
         await task.DeleteAsync();
-        TempData["success"] = "Pomyślnie usunieto!";
+        TempData["success"] = "Pomyślnie usunięto!";
         return Json(new {success = true, data=id});
     }
-    
+    //GET: /TasksManager/EditTask
     public async Task<IActionResult> EditTask(string id)
     {
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/TasksManager/EditTask/"+id});
+        }
+        
         if(!ModelState.IsValid)
             return RedirectToAction("Index", "TasksManager");
         
-        var token = HttpContext.Session.GetString("_UserToken");
-        if (string.IsNullOrEmpty(token))
-        {
-            TempData["msg"] = "Zaloguj się aby kontynuować";
-            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager/EditTask/"+id});
-        }
         var taskDoc = await _db.Collection("Tasks").Document(path: id).GetSnapshotAsync();
         var task = taskDoc.ConvertTo<TasksModel>();
 
@@ -158,15 +155,14 @@ public class TasksManager : Controller
         
         return View(task);
     }
-
+    //POST: /TasksManager/EditTask
     [HttpPost]
     public async Task<IActionResult> EditTask(TasksModel task)
     {
-        var token = HttpContext.Session.GetString("_UserToken");
-        if (string.IsNullOrEmpty(token))
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
         {
-            TempData["msg"] = "Zaloguj się aby kontynuować";
-            return RedirectToAction("SignIn", "Profile", routeValues:new{returnUrl="/TasksManager"});
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/TasksManager/EditTask/"+task.SelfRefId});
         }
         task.SelfReference = _db.Collection("Tasks").Document(task.SelfRefId);
         task.AuthorReference = _db.Collection("Users").Document(task.AuthorRefId);
@@ -244,47 +240,52 @@ public class TasksManager : Controller
     }
 
     [HttpPost]
-    public IActionResult AddLesson([Bind("Lessons")] TasksModel m)
+    public async Task<IActionResult> AddLesson([Bind("Lessons")] TasksModel m)
     {
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return Unauthorized();
+        }
         m.Lessons ??= new List<LessonModel>();
         m.Lessons.Add(new LessonModel());
-        Console.WriteLine(m.Lessons.Count);
         return PartialView("TasksManager/_LessonsList", m);
     }
     [HttpPost]
-    public IActionResult AddQuestion([Bind("Questions")] TasksModel m)
+    public async Task<IActionResult> AddQuestion([Bind("Questions")] TasksModel m)
     {
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return Unauthorized();
+        }
         m.Questions ??= new List<QuestionModel>();
         m.Questions.Add(new QuestionModel());
-        Console.WriteLine(m.Questions.Count);
         return PartialView("TasksManager/_QuestionsList", m);
     }
     
     public async Task<IActionResult> LoadMoreTasksM(int batchSize = 2)
     {
-        string? token = HttpContext.Session.GetString("_UserToken");
-        if (!String.IsNullOrEmpty(token))
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
         {
-            var userId = _auth.GetUserAsync(token).Result.LocalId;
-            DocumentReference author = _db.Collection("Users").Document(userId);
-            Query tasksQuery = _db.Collection("Tasks").WhereEqualTo("AuthorReference", author).OrderBy("Category");
-            if (_lastDoc != null)
-            {
-                tasksQuery = tasksQuery.StartAfter(_lastDoc);
-            }
-            tasksQuery = tasksQuery.Limit(batchSize);
-            
-            QuerySnapshot snapshot = await tasksQuery.GetSnapshotAsync();
-            List<TasksModel> tasks = new List<TasksModel>();
-            foreach (DocumentSnapshot document in snapshot.Documents)
-            {
-                tasks.Add(document.ConvertTo<TasksModel>());
-            }
-
-            _lastDoc = snapshot.Documents.Count > 0 ? snapshot.Documents.Last() : _lastDoc;
-            return PartialView("TasksManager/_TasksMBatch", tasks);
+            return Unauthorized();
         }
-        return PartialView("TasksManager/_TasksMBatch", new List<TasksModel>());
+        
+        var userId = _auth.GetUserAsync(HttpContext.Session.GetString("_UserToken")).Result.LocalId;
+        var author = _db.Collection("Users").Document(userId);
+        var tasksQuery = _db.Collection("Tasks").WhereEqualTo("AuthorReference", author).OrderBy("Category");
+        if (_lastDoc != null)
+        {
+            tasksQuery = tasksQuery.StartAfter(_lastDoc);
+        }
+        tasksQuery = tasksQuery.Limit(batchSize);
+            
+        var snapshot = await tasksQuery.GetSnapshotAsync();
+        var tasks = snapshot.Documents.Select(document => document.ConvertTo<TasksModel>()).ToList();
+
+        _lastDoc = snapshot.Documents.Count > 0 ? snapshot.Documents[^1] : _lastDoc;
+        return PartialView("TasksManager/_TasksMBatch", tasks);
     }
     
     
@@ -292,5 +293,40 @@ public class TasksManager : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+    }
+    private async Task<bool> IsAuthorized()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["msg"] = "Zaloguj się aby kontynuować";
+            return false;
+        }
+        try
+        {
+            await _auth.GetUserAsync(token);
+            return true;
+        }
+        catch (FirebaseAuthException e)
+        {
+            if (e.Reason == AuthErrorReason.InvalidIDToken)
+            {
+                TempData["msg"] = "Nieprawidłowy token uwierzytelniający! Zaloguj się aby kontynuować";
+            }
+            return false;
+        }
+    }
+    private async Task DeleteCollection(CollectionReference collectionReference, int batchSize){
+        var snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
+        IReadOnlyList<DocumentSnapshot> documents = snapshot.Documents;
+        while (documents.Count > 0)
+        {
+            foreach (DocumentSnapshot document in documents)
+            {
+                await document.Reference.DeleteAsync();
+            }
+            snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
+            documents = snapshot.Documents;
+        }
     }
 }
