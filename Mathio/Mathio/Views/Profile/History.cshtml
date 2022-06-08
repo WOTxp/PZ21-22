@@ -14,18 +14,12 @@ body{
     font-weight: bold;
     background-color: #3A8CFF;
     color: #FFFFFF;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 2px 10px;
 }
 
 .data-field-1{
     color: #555;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding: 2px 10px;
     text-align: left;
     font-style: italic;
     background-color: #F3F3F3;
@@ -37,18 +31,12 @@ body{
     font-weight: bold;
     background-color: #3486F8;
     color: #FFFFFF;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 2px 10px;
 }
 
 .data-field-2{
     color: #555;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding: 2px 10px;
     text-align: left;
     font-style: italic;
     background-color: #E8E8E8;
@@ -60,17 +48,14 @@ body{
 }
 
 .data-table{
-    margin: auto
+    margin: auto;
     width: 90%;
 }
 
 .content{
     margin: auto;
     background-color: #FFFFFF;
-    padding-left: 30px;
-    padding-right: 30px;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding: 20px 30px;
     widht: 100%;
     text-align: center;
 }
@@ -122,10 +107,10 @@ a:link{
             
             <div class="test-history margin-top-20 col-sm-12 col-md-6 col-lg-4">
                 <table class="test-table">
-                    <tr><td class="field-1">Test</td><td class="data-field-1">@historyTest.Task?.Title</td></tr>
+                    <tr><td class="field-1">Zadanie</td><td class="data-field-1">@historyTest.Task?.Title</td></tr>
                     <tr><td class="field-2">Autor</td><td class="data-field-2">@historyTest.Task?.Author?.UserName</td></tr>
-                    <tr><td class="field-1">Wynik</td><td class="data-field-1">@historyTest.Score/@historyTest.Task?.QuestionsPerTest</td></tr>
-                    <tr><td class="field-2">Zakonczono</td><td class="data-field-2">@historyTest.Date?.ToDateTime()</td></tr>
+                    <tr><td class="field-1">Wynik testu</td><td class="data-field-1">@historyTest.Score/@historyTest.Task?.QuestionsPerTest</td></tr>
+                    <tr><td class="field-2">Zakończono</td><td class="data-field-2">@historyTest.Date?.ToDateTime()</td></tr>
                 </table>
             </div>
             }

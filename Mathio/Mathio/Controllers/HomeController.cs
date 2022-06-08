@@ -8,13 +8,11 @@ namespace Mathio.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
     private FirebaseAuthProvider _auth;
     private FirestoreDb _db;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController()
     {
-        _logger = logger;
         _auth = new FirebaseAuthProvider(
             new FirebaseConfig("AIzaSyAFjhO8zLz4S-nUoZyEtXZbzawQ0oor78k"));
         _db = FirestoreDb.Create("pz202122-cf12f");
@@ -22,6 +20,17 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        var token = HttpContext.Session.GetString("_UserToken");
+        ViewBag.Layout = string.IsNullOrEmpty(token) ? "_Layout2" : "_Layout";
+        
+        return View();
+    }
+
+    public IActionResult Privacy()
+    {
+        var token = HttpContext.Session.GetString("_UserToken");
+        ViewBag.Layout = string.IsNullOrEmpty(token) ? "_Layout2" : "_Layout";
+        
         return View();
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

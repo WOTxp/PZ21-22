@@ -186,7 +186,7 @@ body{
   letter-spacing:1px;
 }
 
-#button-div-settings{
+.button-div-settings{
     margin-top: 20px;
     padding-top: 10px;
     font-size: 20px;
@@ -199,7 +199,7 @@ body{
     transition-timing-function: linear;
 }
 
-#button-div-settings:hover{
+.button-div-settings:hover{
     background-color: #3082F4;
     color: #EEEEEE;
     transition-duration: 0.5s;
@@ -300,37 +300,37 @@ body{
                 </table>
             </div>
             <a href="/Profile/Settings" class="normal-link">
-                <div id="button-div-settings">
+                <div class="button-div-settings">
                     <h4>Zmień</h4>
                 </div>
             </a>
             <div style="clear:both"></div>
     
             <div class="content margin-top-20">
-                <div id="tasks-history"><h4>Ukończone testy</h4></div>
+                <div id="tasks-history"><h4>Status wykonania zadań</h4></div>
                 
                 @{
                     if (@Model.TasksStatus == null || @Model.TasksStatus.Count == 0)
                     {
-                        <h4 class="margin-top-20">No opened tasks</h4>
+                        <h4 class="margin-top-20">Brak otwartych zadań</h4>
                     }
                     else
                     {
                         foreach (var taskStatus in @Model.TasksStatus)
                         {
                            <table class="task-table margin-top-20">
-                                <tr><td class="field-1">Test</td><td class="data-field-1">@taskStatus.Task?.Title</td></tr>
+                                <tr><td class="field-1">Zadanie</td><td class="data-field-1">@taskStatus.Task?.Title</td></tr>
                                 <tr><td class="field-2">Kategoria</td><td class="data-field-2">@taskStatus.Task?.Category</td></tr>
                                 <tr><td class="field-1">Autor</td><td class="data-field-1">@taskStatus.Task?.Author?.UserName</td></tr>
                                 <tr><td class="field-2">Teoria</td><td class="data-field-2">@taskStatus.TestScore/@taskStatus.Task?.QuestionsPerTest</td></tr>
-                                <tr><td class="field-1">Praktyka</td><td class="data-field-1">@taskStatus.CurrentPage/@taskStatus.Task?.NumPages</td></tr>
+                                <tr><td class="field-1">Wynik testu</td><td class="data-field-1">@taskStatus.CurrentPage/@taskStatus.Task?.NumPages</td></tr>
                             </table> 
                         }
                     }
                 }
                <a href="/Profile/History" class="normal-link">
-                    <div id="button-div-settings">
-                        <h4>Sprawdz</h4>
+                    <div class="button-div-settings">
+                        <h4>Historia wykonanych testów</h4>
                     </div>
                 </a>
             </div>
