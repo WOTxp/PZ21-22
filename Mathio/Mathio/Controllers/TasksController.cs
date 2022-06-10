@@ -77,6 +77,34 @@ public class TasksController : Controller
         TempData["num"] = num;
         return View(_testManager);
     }
+    
+    [Route("Tasks/{id}/Summary")]
+    public IActionResult Summary(string id)
+    {
+        if (_testManager == null || _openedTask?.SelfReference?.Id != id)
+        {
+            return RedirectToAction("Questions", "Tasks", new {id});
+        }
+
+        return View(_testManager);
+    }
+    
+    [Route("Tasks/{id}/Result")]
+    public IActionResult Result(string id)
+    {
+        if (_testManager == null || _openedTask?.SelfReference?.Id != id || _testManager.testQuestions == null)
+        {
+            return RedirectToAction("Questions", "Tasks", new {id});
+        }
+
+        var result = new TestHistoryModel();
+        result.Task = _testManager.Task;
+        var score = _testManager.testQuestions.Count(q => q.AnswerModel.Answer == q.CorrectAnswer);
+
+        result.Score = score;
+        result.Date = Timestamp.GetCurrentTimestamp();
+        return View(result);
+    }
     //GET: /Tasks/LoadMoreTasks
     public async Task<IActionResult?> LoadMoreTasks(int batchSize = 2)
     {
