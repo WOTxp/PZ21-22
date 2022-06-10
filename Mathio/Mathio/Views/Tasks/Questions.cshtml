@@ -78,6 +78,6 @@ $("#next").on("click", function () {
     SaveAnswer('@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 0)+1})');
 });
 $("#finish").on("click", function () {
-    SaveAnswer('/Tasks');
+    SaveAnswer('@Url.Action("Summary","Tasks", new {id=Model.Task.SelfReference?.Id})');
 });
 </script>
