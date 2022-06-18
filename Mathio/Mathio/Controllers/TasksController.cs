@@ -36,6 +36,35 @@ public class TasksController : Controller
         _lastDoc = null;
         return View();
     }
+
+    private async void UpdateTaskStatus(TasksStatusModel taskStatus)
+    {
+        var user = await _auth.GetUserAsync(HttpContext.Session.GetString("_UserToken"));
+        var tasksStatusRef = _db.Collection("Users").Document(user.LocalId).Collection("TasksStatus");
+        
+        var statusQ = await tasksStatusRef.WhereEqualTo("TaskReference", taskStatus.TaskReference).GetSnapshotAsync();
+        var statusRef = statusQ.Documents.FirstOrDefault();
+        if(statusRef != null)
+        {
+            var status = statusRef.ConvertTo<TasksStatusModel>();
+            
+            var updates = new Dictionary<FieldPath, object>();
+            if (taskStatus.CurrentPage > status.CurrentPage)
+            {
+                updates.Add(new FieldPath("CurrentPage"), taskStatus.CurrentPage);
+            }
+            if (taskStatus.TestScore > status.TestScore)
+            {
+                updates.Add(new FieldPath("TestScore"), taskStatus.TestScore);
+            }
+            if (updates.Count > 0)
+                await statusRef.Reference.UpdateAsync(updates);
+        }
+        else
+        {
+            await tasksStatusRef.AddAsync(taskStatus);
+        }
+    }
     //GET: /Tasks/ID/Lessons
     [Route("Tasks/{id}/Lessons")]
     public async Task<IActionResult> Lessons(string id, int page=1)
@@ -53,6 +82,13 @@ public class TasksController : Controller
         }
 
         await _openedTask.GetLesson(page);
+        var taskStatus = new TasksStatusModel
+        {
+            TaskReference = _openedTask.SelfReference,
+            CurrentPage = page,
+            TestScore = 0
+        };
+        UpdateTaskStatus(taskStatus);
         return View(_openedTask);
     }
     //GET: /Tasks/ID/Questions
@@ -64,10 +100,11 @@ public class TasksController : Controller
         {
             return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks/"+id+"/Questions?num="+num});
         }
-        if (_testManager ==null || _openedTask?.SelfReference?.Id != id)
+        if (_testManager == null || _openedTask?.SelfReference?.Id != id)
         {
             var taskDoc = await _db.Collection("Tasks").Document(id).GetSnapshotAsync();
             _openedTask = taskDoc.ConvertTo<TasksModel>();
+            await _openedTask.DownloadAuthor();
             _testManager = new TestManager(_openedTask);
             Console.WriteLine(_testManager.Task.SelfReference?.Id);
             await _testManager.SetupTest();
@@ -90,19 +127,35 @@ public class TasksController : Controller
     }
     
     [Route("Tasks/{id}/Result")]
-    public IActionResult Result(string id)
+    public async Task<IActionResult> Result(string id)
     {
         if (_testManager == null || _openedTask?.SelfReference?.Id != id || _testManager.testQuestions == null)
         {
             return RedirectToAction("Questions", "Tasks", new {id});
         }
-
-        var result = new TestHistoryModel();
-        result.Task = _testManager.Task;
+        var user = await _auth.GetUserAsync(HttpContext.Session.GetString("_UserToken"));
+        var testsHistoryRef = _db.Collection("Users").Document(user.LocalId).Collection("TestsHistory");
+        
         var score = _testManager.testQuestions.Count(q => q.AnswerModel.Answer == q.CorrectAnswer);
+        var result = new TestHistoryModel
+        {
+            TaskReference = _testManager.Task.SelfReference,
+            Task = _testManager.Task,
+            Score = score,
+            Date = Timestamp.GetCurrentTimestamp()
+        };
+        await testsHistoryRef.AddAsync(result);
+        
+        var taskStatus = new TasksStatusModel
+        {
+            TaskReference = _testManager.Task.SelfReference,
+            CurrentPage = 0,
+            TestScore = score
+        };
+        UpdateTaskStatus(taskStatus);
 
-        result.Score = score;
-        result.Date = Timestamp.GetCurrentTimestamp();
+        _openedTask = null;
+        _testManager = null;
         return View(result);
     }
     //GET: /Tasks/LoadMoreTasks
