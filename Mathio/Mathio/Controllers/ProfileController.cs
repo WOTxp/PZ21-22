@@ -62,8 +62,19 @@ public class ProfileController : Controller
         }
     }
     //GET: /Profile/Register
-    public IActionResult Register()
+    public async Task<IActionResult> Register()
     {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (string.IsNullOrEmpty(token)) return View();
+        try
+        {
+            await _auth.GetUserAsync(token);
+            return RedirectToAction("Index", "Profile");
+        }
+        catch (FirebaseAuthException)
+        {
+            HttpContext.Session.Remove("_UserToken");
+        }
         return View();
     }
     //POST: /Profile/Register
@@ -108,8 +119,21 @@ public class ProfileController : Controller
         }
     }
     //GET: /Profile/SignIn
-    public IActionResult SignIn(string? returnUrl)
+    public async Task<IActionResult> SignIn(string? returnUrl)
     {
+        var token = HttpContext.Session.GetString("_UserToken");
+        if (!string.IsNullOrEmpty(token))
+        {
+            try
+            {
+                await _auth.GetUserAsync(token);
+                return RedirectToAction("Index", "Profile");
+            }
+            catch (FirebaseAuthException)
+            {
+                HttpContext.Session.Remove("_UserToken");
+            }
+        }
         if (string.IsNullOrEmpty(returnUrl))
         {
             return View();

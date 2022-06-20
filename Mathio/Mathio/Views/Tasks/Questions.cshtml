@@ -50,7 +50,7 @@
     }
 </div>
 <script type="text/javascript" defer>
-function SaveAnswer(){
+function SaveAnswer(href){
     let d = $("#AnswerForm").serialize();
         $.ajax({
             type: "POST",
@@ -59,18 +59,25 @@ function SaveAnswer(){
             data: d,
             success: function (response) {
                 alert(response["msg"]);
+                location.href = href;
+            },
+            error: function (xhr){
+                if (xhr.status===401){
+                    location.replace("/Profile/SignIn?returnUrl="+location.href);
+                }
+                else {
+                    alert(xhr.status);
+                }
             }
         });
 }
 $("#prev").on("click", function () {
-  SaveAnswer();
-  location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 2)-1})'
+  SaveAnswer('@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 2)-1})');
 });
 $("#next").on("click", function () {
-    SaveAnswer();
-    location.href = '@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 0)+1})'
+    SaveAnswer('@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 0)+1})');
 });
 $("#finish").on("click", function () {
-    SaveAnswer();
+    SaveAnswer('@Url.Action("Summary","Tasks", new {id=Model.Task.SelfReference?.Id})');
 });
 </script>
