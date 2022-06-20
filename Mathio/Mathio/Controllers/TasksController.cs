@@ -116,9 +116,9 @@ public class TasksController : Controller
     }
     
     [Route("Tasks/{id}/Summary")]
-    public IActionResult Summary(string id)
+    public async Task<IActionResult> Summary(string id)
     {
-        var isAuthorized = IsAuthorized().Result;
+        var isAuthorized = await IsAuthorized();
         if (!isAuthorized)
         {
             return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks/"+id+"/Summary"});
@@ -134,7 +134,7 @@ public class TasksController : Controller
     [Route("Tasks/{id}/Result")]
     public async Task<IActionResult> Result(string id)
     {
-        var isAuthorized = IsAuthorized().Result;
+        var isAuthorized = await IsAuthorized();
         if (!isAuthorized)
         {
             return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks/"+id+"/Result"});
