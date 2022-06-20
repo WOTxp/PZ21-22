@@ -194,7 +194,6 @@ ul.answers{
                 data: $("#taskForm").serialize(),
                 url: '@Url.Action("AddQuestion", "TasksManager")',
                 success: function (response) {
-                    alert(response)
                     $("#questions").html(response);
                 },
                 error: function (xhr){
@@ -213,10 +212,18 @@ ul.answers{
             $(this).parents(".lesson").find(".deleted").val("True");
             ReEnumerate();
         });
-        
-        $("#questions").on("click", ".del_question", function (){
+        let questions = $("#questions");
+        questions.on("click", ".del_question", function (){
             $(this).parents(".question").attr("hidden",true);
             $(this).parents(".question").find(".deleted").val("True");
+        });
+        
+        questions.on("change", ".type-select", function (e){
+            let v = $(e.target).val();
+            if (v === "closed")
+                $(this).parents(".question").find(".answers-box").attr("hidden", false);
+            else if (v === "open")
+                $(this).parents(".question").find(".answers-box").attr("hidden", true);
         });
     </script>
 }
