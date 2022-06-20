@@ -90,12 +90,28 @@ body{
 </div>
 
 <script type="text/javascript" defer>
+$( window ).on( "load", function (){
+    $.ajax({
+        type: "GET",
+        url: '@Url.Action("LoadMoreTasks", "Tasks", new { batchSize=6 })',
+        success: function (response) {
+            document.getElementById("tasks").innerHTML+=response;
+        },
+        error: function (xhr){
+            if (xhr.status===401){
+                location.replace("/Profile/SignIn?returnUrl=/Tasks");
+            }
+            else {
+                alert(xhr.status);
+            }
+        }
+    });
+});
 $("#load").on("click", function () {
     $.ajax({
         type: "GET",
-        url: '@Url.Action("LoadMoreTasks", "Tasks", new { batchSize=2 })',
+        url: '@Url.Action("LoadMoreTasks", "Tasks", new { batchSize=3 })',
         success: function (response) {
-            alert(response)
             document.getElementById("tasks").innerHTML+=response;
         },
         error: function (xhr){

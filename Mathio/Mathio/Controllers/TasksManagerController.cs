@@ -3,6 +3,7 @@ using Firebase.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Google.Cloud.Firestore;
+using Newtonsoft.Json;
 
 namespace Mathio.Controllers;
 
@@ -11,7 +12,6 @@ public class TasksManager : Controller
 {
     private readonly FirebaseAuthProvider _auth;
     private readonly FirestoreDb _db;
-    private static DocumentSnapshot? _lastDoc;
     public TasksManager()
     {
         _auth = new FirebaseAuthProvider(
@@ -26,7 +26,8 @@ public class TasksManager : Controller
         {
             return RedirectToAction("SignIn", "Profile", new {returnUrl = "/TasksManager"});
         }
-        _lastDoc = null;
+
+        SaveLastDoc(null);
         return View();
     }
     //GET: /TasksManager/AddTask
@@ -275,16 +276,20 @@ public class TasksManager : Controller
         var userId = _auth.GetUserAsync(HttpContext.Session.GetString("_UserToken")).Result.LocalId;
         var author = _db.Collection("Users").Document(userId);
         var tasksQuery = _db.Collection("Tasks").WhereEqualTo("AuthorReference", author).OrderBy("Category");
-        if (_lastDoc != null)
+
+        var lastDoc = await GetLastDoc();
+        if (lastDoc != null)
         {
-            tasksQuery = tasksQuery.StartAfter(_lastDoc);
+            tasksQuery = tasksQuery.StartAfter(lastDoc);
         }
         tasksQuery = tasksQuery.Limit(batchSize);
             
         var snapshot = await tasksQuery.GetSnapshotAsync();
         var tasks = snapshot.Documents.Select(document => document.ConvertTo<TasksModel>()).ToList();
 
-        _lastDoc = snapshot.Documents.Count > 0 ? snapshot.Documents[^1] : _lastDoc;
+        lastDoc = snapshot.Documents.Count > 0 ? snapshot.Documents[^1] : lastDoc;
+        SaveLastDoc(lastDoc);
+        
         return PartialView("TasksManager/_TasksMBatch", tasks);
     }
     
@@ -328,5 +333,29 @@ public class TasksManager : Controller
             snapshot = await collectionReference.Limit(batchSize).GetSnapshotAsync();
             documents = snapshot.Documents;
         }
+    }
+
+    private async Task<DocumentSnapshot?> GetLastDoc()
+    {
+        var lastDocRef = HttpContext.Session.GetString("_lastDoc");
+        DocumentSnapshot? lastDoc = null;
+        if (!String.IsNullOrEmpty(lastDocRef))
+        {
+            Console.WriteLine(lastDocRef);
+            var reference = _db.Document(lastDocRef);
+            lastDoc = await reference.GetSnapshotAsync();
+        }
+
+        return lastDoc;
+    }
+
+    private void SaveLastDoc(DocumentSnapshot? doc)
+    {
+        var reference = "";
+        if (doc != null)
+        {
+            reference = doc.Reference.Parent.Id+"/"+doc.Reference.Id;
+        }
+        HttpContext.Session.SetString("_lastDoc", reference);
     }
 }
