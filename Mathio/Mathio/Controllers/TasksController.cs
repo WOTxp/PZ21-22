@@ -124,6 +124,12 @@ public class TasksController : Controller
     [Route("Tasks/{id}/Summary")]
     public async Task<IActionResult> Summary(string id)
     {
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks/"+id+"/Summary"});
+        }
+        
         var openedTask = await GetOpenedTask();
         var testManager = await GetTestManager();
         if (testManager == null || openedTask?.SelfReference?.Id != id)
@@ -137,6 +143,12 @@ public class TasksController : Controller
     [Route("Tasks/{id}/Result")]
     public async Task<IActionResult> Result(string id)
     {
+        var isAuthorized = await IsAuthorized();
+        if (!isAuthorized)
+        {
+            return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks/"+id+"/Result"});
+        }
+
         var openedTask = await GetOpenedTask();
         var testManager = await GetTestManager();
         if (testManager == null || openedTask?.SelfReference?.Id != id || testManager.testQuestions == null)
