@@ -3,6 +3,7 @@ using Firebase.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Mathio.Models;
 using Google.Cloud.Firestore;
+using Newtonsoft.Json;
 
 
 namespace Mathio.Controllers;
@@ -10,9 +11,6 @@ namespace Mathio.Controllers;
 public class TasksController : Controller
 {
     private readonly FirestoreDb _db;
-    private static DocumentSnapshot? _lastDoc;
-    private static TasksModel? _openedTask;
-    private static TestManager? _testManager;
     private readonly FirebaseAuthProvider _auth;
 
     public TasksController()
@@ -31,9 +29,9 @@ public class TasksController : Controller
         {
             return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks"});
         }
-        _openedTask = null;
-        _testManager = null;
-        _lastDoc = null;
+        SaveOpenedTask(null);
+        SaveTestManager(null);
+        SaveLastDoc(null);
         return View();
     }
 
@@ -74,22 +72,25 @@ public class TasksController : Controller
         {
             return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks/"+id+"/Lessons?page="+page});
         }
-        if (_openedTask?.SelfReference?.Id != id)
+
+        var openedTask = await GetOpenedTask();
+        if (openedTask?.SelfReference?.Id != id)
         {
             var taskDoc = await _db.Collection("Tasks").Document(id).GetSnapshotAsync();
-            _openedTask = taskDoc.ConvertTo<TasksModel>();
-            await _openedTask.DownloadAuthor();
+            openedTask = taskDoc.ConvertTo<TasksModel>();
+            await openedTask.DownloadAuthor();
+            SaveOpenedTask(openedTask);
         }
 
-        await _openedTask.GetLesson(page);
+        await openedTask.GetLesson(page);
         var taskStatus = new TasksStatusModel
         {
-            TaskReference = _openedTask.SelfReference,
+            TaskReference = openedTask.SelfReference,
             CurrentPage = page,
             TestScore = 0
         };
         UpdateTaskStatus(taskStatus);
-        return View(_openedTask);
+        return View(openedTask);
     }
     //GET: /Tasks/ID/Questions
     [Route("Tasks/{id}/Questions")]
@@ -100,47 +101,56 @@ public class TasksController : Controller
         {
             return RedirectToAction("SignIn", "Profile", new {returnUrl = "/Tasks/"+id+"/Questions?num="+num});
         }
-        if (_testManager == null || _openedTask?.SelfReference?.Id != id)
+
+        var openedTask = await GetOpenedTask();
+        var testManager = await GetTestManager();
+        if (testManager == null || openedTask?.SelfReference?.Id != id)
         {
             var taskDoc = await _db.Collection("Tasks").Document(id).GetSnapshotAsync();
-            _openedTask = taskDoc.ConvertTo<TasksModel>();
-            await _openedTask.DownloadAuthor();
-            _testManager = new TestManager(_openedTask);
-            Console.WriteLine(_testManager.Task.SelfReference?.Id);
-            await _testManager.SetupTest();
+            openedTask = taskDoc.ConvertTo<TasksModel>();
+            await openedTask.DownloadAuthor();
+            SaveOpenedTask(openedTask);
+            
+            testManager = new TestManager(openedTask);
+            await testManager.SetupTest();
         }
-
-        _testManager.GetQuestion(num - 1);
+        testManager.GetQuestion(num - 1);
+        SaveTestManager(testManager);
+        
         TempData["num"] = num;
-        return View(_testManager);
+        return View(testManager);
     }
     
     [Route("Tasks/{id}/Summary")]
-    public IActionResult Summary(string id)
+    public async Task<IActionResult> Summary(string id)
     {
-        if (_testManager == null || _openedTask?.SelfReference?.Id != id)
+        var openedTask = await GetOpenedTask();
+        var testManager = await GetTestManager();
+        if (testManager == null || openedTask?.SelfReference?.Id != id)
         {
             return RedirectToAction("Questions", "Tasks", new {id});
         }
 
-        return View(_testManager);
+        return View(testManager);
     }
     
     [Route("Tasks/{id}/Result")]
     public async Task<IActionResult> Result(string id)
     {
-        if (_testManager == null || _openedTask?.SelfReference?.Id != id || _testManager.testQuestions == null)
+        var openedTask = await GetOpenedTask();
+        var testManager = await GetTestManager();
+        if (testManager == null || openedTask?.SelfReference?.Id != id || testManager.testQuestions == null)
         {
             return RedirectToAction("Questions", "Tasks", new {id});
         }
         var user = await _auth.GetUserAsync(HttpContext.Session.GetString("_UserToken"));
         var testsHistoryRef = _db.Collection("Users").Document(user.LocalId).Collection("TestsHistory");
         
-        var score = _testManager.testQuestions.Count(q => q.AnswerModel.Answer == q.CorrectAnswer);
+        var score = testManager.testQuestions.Count(q => q.AnswerModel.Answer == q.CorrectAnswer);
         var result = new TestHistoryModel
         {
-            TaskReference = _testManager.Task.SelfReference,
-            Task = _testManager.Task,
+            TaskReference = testManager.Task.SelfReference,
+            Task = testManager.Task,
             Score = score,
             Date = Timestamp.GetCurrentTimestamp()
         };
@@ -148,14 +158,13 @@ public class TasksController : Controller
         
         var taskStatus = new TasksStatusModel
         {
-            TaskReference = _testManager.Task.SelfReference,
+            TaskReference = testManager.Task.SelfReference,
             CurrentPage = 0,
             TestScore = score
         };
         UpdateTaskStatus(taskStatus);
-
-        _openedTask = null;
-        _testManager = null;
+        SaveOpenedTask(null);
+        SaveTestManager(null);
         return View(result);
     }
     //GET: /Tasks/LoadMoreTasks
@@ -188,13 +197,14 @@ public class TasksController : Controller
         if (model.QuestionId == null) return Json(new {success = false, msg = "Wrong data!"});
        
         Console.WriteLine(model.QuestionId, model.Answer);
+        var testManager = await GetTestManager();
+        if (testManager == null) return Json(new {success = false, msg = "No Test Manager!"});
         
-        if (_testManager == null) return Json(new {success = false, msg = "No Test Manager!"});
-        
-        if (_testManager.currentQuestion?.ID != model.QuestionId)
+        if (testManager.currentQuestion?.ID != model.QuestionId)
             return Json(new {success = false, msg = "Something went wrong!"});
 
-        var saved = _testManager.SaveAnswer(model);
+        var saved = testManager.SaveAnswer(model);
+        SaveTestManager(testManager);
         return Json(saved ? new {success=true, msg="Answer saved!"} : new {success = false, msg = "Something went wrong!"});
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -228,10 +238,10 @@ public class TasksController : Controller
     private async Task<List<TasksModel>> GetTasksCategoryBatch(int batchSize)
     {
         var tasksQuery = _db.Collection("Tasks").OrderBy("Category");
-
-        if (_lastDoc != null)
+        var lastDoc = await GetLastDoc();
+        if (lastDoc != null)
         {
-            tasksQuery = tasksQuery.StartAfter(_lastDoc);
+            tasksQuery = tasksQuery.StartAfter(lastDoc);
         }
 
         tasksQuery = tasksQuery.Limit(batchSize);
@@ -239,7 +249,80 @@ public class TasksController : Controller
         var snapshot = await tasksQuery.GetSnapshotAsync();
         var tasks = snapshot.Documents.Select(document => document.ConvertTo<TasksModel>()).ToList();
 
-        _lastDoc = snapshot.Documents.Count > 0 ? snapshot.Documents.Last() : null;
+        lastDoc = snapshot.Documents.Count > 0 ? snapshot.Documents[^1] : lastDoc;
+        SaveLastDoc(lastDoc);
         return tasks;
+    }
+    
+    private async Task<DocumentSnapshot?> GetLastDoc()
+    {
+        var lastDocRef = HttpContext.Session.GetString("_lastDoc");
+        DocumentSnapshot? lastDoc = null;
+        if (!String.IsNullOrEmpty(lastDocRef))
+        {
+            Console.WriteLine(lastDocRef);
+            var reference = _db.Document(lastDocRef);
+            lastDoc = await reference.GetSnapshotAsync();
+        }
+
+        return lastDoc;
+    }
+    private void SaveLastDoc(DocumentSnapshot? doc)
+    {
+        var reference = "";
+        if (doc != null)
+        {
+            reference = doc.Reference.Parent.Id+"/"+doc.Reference.Id;
+        }
+        HttpContext.Session.SetString("_lastDoc", reference);
+    }
+
+    private async Task<TasksModel?> GetOpenedTask()
+    {
+        var openedTaskRef = HttpContext.Session.GetString("_lastDoc");
+        TasksModel? task = null;
+        if (!String.IsNullOrEmpty(openedTaskRef))
+        {
+            var reference = _db.Document(openedTaskRef);
+            var documentSnapshot = await reference.GetSnapshotAsync();
+            if (documentSnapshot != null)
+            {
+                task = documentSnapshot.ConvertTo<TasksModel>();
+                await task.DownloadAuthor();
+            }
+        }
+        return task;
+    }
+    private void SaveOpenedTask(TasksModel? task)
+    {
+        var reference = "";
+        if (task != null)
+        {
+            reference = task.SelfReference?.Parent.Id+"/"+task.SelfReference?.Id;
+        }
+        HttpContext.Session.SetString("_lastDoc", reference);
+    }
+
+    private async Task<TestManager?> GetTestManager()
+    {
+        var testMStr = HttpContext.Session.GetString("_testManager");
+        if (testMStr == null) return null;
+        
+        var testManager = JsonConvert.DeserializeObject<TestManager?>(testMStr);
+        if(testManager != null)
+            testManager.Task = (await GetOpenedTask())!;
+        return testManager;
+
+    }
+
+    private void SaveTestManager(TestManager? testManager)
+    {
+        if (testManager != null)
+        {
+            var testMStr = JsonConvert.SerializeObject(testManager);
+            HttpContext.Session.SetString("_testManager", testMStr);
+            return;
+        }
+        HttpContext.Session.Remove("_testManager");
     }
 }

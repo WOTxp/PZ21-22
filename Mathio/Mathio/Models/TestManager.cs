@@ -1,7 +1,10 @@
-﻿namespace Mathio.Models;
+﻿using Newtonsoft.Json;
+
+namespace Mathio.Models;
 
 public class TestManager
 {
+    [JsonIgnore]
     public TasksModel Task;
     public List<QuestionModel>? testQuestions;
     public QuestionModel? currentQuestion;
