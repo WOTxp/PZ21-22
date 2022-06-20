@@ -57,8 +57,7 @@ function SaveAnswer(href){
             url: '/Tasks/SaveAnswer',
             dataType: 'json',
             data: d,
-            success: function (response) {
-                alert(response["msg"]);
+            success: function () {
                 location.href = href;
             },
             error: function (xhr){
