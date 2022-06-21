@@ -17,9 +17,7 @@ $("#confirm").on("click", function () {
         type: "DELETE",
         url: '@Url.Action("DeleteTaskAll", "TasksManager", new {id=Model.SelfReference?.Id})',
         success: function (response) {
-            alert(JSON.stringify(response));
             if(response["success"]){
-                alert("UDALO SIE!");
                 location.replace("@Url.Action("Index", "TasksManager")");
             }
         },
