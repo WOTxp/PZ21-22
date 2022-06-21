@@ -16,7 +16,7 @@
             else if(Model.Type == "closed")
             {
                 <form id="AnswerForm">
-                    <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden/>
+                    <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden class="margin-top-5"/>
                     <select name="Answer" asp-for="AnswerModel.Answer">
                         @if (Model?.Answers != null)
                         {
