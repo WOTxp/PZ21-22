@@ -42,6 +42,7 @@ public class TasksController : Controller
         
         var statusQ = await tasksStatusRef.WhereEqualTo("TaskReference", taskStatus.TaskReference).GetSnapshotAsync();
         var statusRef = statusQ.Documents.FirstOrDefault();
+        var pointsToAdd = 0;
         if(statusRef != null)
         {
             var status = statusRef.ConvertTo<TasksStatusModel>();
@@ -54,6 +55,7 @@ public class TasksController : Controller
             if (taskStatus.TestScore > status.TestScore)
             {
                 updates.Add(new FieldPath("TestScore"), taskStatus.TestScore);
+                pointsToAdd = taskStatus.TestScore - status.TestScore;
             }
             if (updates.Count > 0)
                 await statusRef.Reference.UpdateAsync(updates);
@@ -61,7 +63,17 @@ public class TasksController : Controller
         else
         {
             await tasksStatusRef.AddAsync(taskStatus);
+            pointsToAdd = taskStatus.TestScore;
         }
+        
+        //Aktualizacja punktów użytkownika
+        var userRef = _db.Collection("Users").Document(user.LocalId);
+        var userDoc = await userRef.GetSnapshotAsync();
+        var userModel = userDoc.ConvertTo<UserModel>();
+        var points = userModel.Points + pointsToAdd;
+        var update = new Dictionary<FieldPath, object>();
+        update.Add(new FieldPath("Points"), points);
+        await userRef.UpdateAsync(update);
     }
     //GET: /Tasks/ID/Lessons
     [Route("Tasks/{id}/Lessons")]
