@@ -5,15 +5,175 @@
     Layout = "_Layout";
 }
 
-<h2>Zadanie</h2>
+<style>
 
-<p>@Model.Task?.Title</p>
-<p>@Model.Task?.Category</p>
-<p>@Model.Task?.Description</p>
-<p>@Model.Task?.LastUpdate?.ToDateTime()</p>
-<p>@Model.Task?.Author?.UserName</p>
+body{
+    background-color: #EEEEEE;
+}
 
-<h2>Wynik</h2>
-<p>@Model.Score / @Model.Task?.QuestionsPerTest</p>
-<p>@Model.Date?.ToDateTime()</p>
-<p>Gratulacje</p>
+.content{
+    margin: auto;
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    min-width: 375px;
+    align-content: center;
+}
+
+.field-group-extra{
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.submit-group-extra{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.field-extra{
+    margin-top: 20px;
+    border-radius: 25px;
+}
+
+.submit-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.submit-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #FFFFFF;
+    color: #222222;
+    border: 2px #E0E0E0 solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra:hover{
+    background-color: #F0F0F0;
+    color: #222222;
+    border: 2px #CCCCCC solid;
+    text-shadow: 0 0 0.5px #888888;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.hide{
+    display: none;
+}
+
+.main-name{
+    color: #FEFEFE;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    background-color: #088AFC;
+    width: 100%;
+    padding: 10px;
+    min-width: 375px;
+    align-content: center;
+}
+
+.news{
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+td {
+  text-align: center;
+  vertical-align: top;
+}
+
+.margin-top-5{
+    margin-top: 5px;
+}
+
+.margin-top-10{
+    margin-top: 10px;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}
+
+.margin-top-25{
+    margin-top: 25px;
+}
+
+.extra:hover{
+    background-color: #3082F4;
+    color: #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.title{
+    background-color: #088AFC;
+    padding: 14px;
+    color: #FFFFFF;
+    text-align: center;
+    width: 100%;
+    font-size: 20px;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+</style>
+
+<div class="row">
+    <div class="col-sm-0 col-md-0 col-lg-2"></div>
+
+     
+    <div class="col-sm-12 col-md-5 col-lg-3">
+        <div class="main-name margin-top-20">Zadanie</div>
+        <div class="content">
+            <table>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Kategoria: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Category</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Tytuł: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Title</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Opis: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Description</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Autor: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Author?.UserName</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Punkty: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Author?.Points</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Kategoria: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.LastUpdate</i></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-sm-0 col-md-0 col-lg-2"></div>
+
+    <div class="col-sm-12 col-md-5 col-lg-3">
+        <div class="main-name margin-top-20">Wynik</div>
+        <div class="content">
+            <table>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Zdobyto: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Score / @Model.Task?.QuestionsPerTest</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Ukończono: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Date?.ToDateTime()</i></tr>
+            </table>
+        </div>
+        <a href="/Tasks" class="link"><div class="title extra cursor-pointer">Ucieczka</div></a>
+    </div>
+
+    <div class="col-sm-0 col-md-0 col-lg-2"></div>
+</div>
