@@ -9,14 +9,14 @@
             if (Model.Type == "open")
             {
                 <form id="AnswerForm">
-                    <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden/>
+                    <input name="QuestionId" asp-for="AnswerModel.QuestionId"  class="margin-top-10" hidden/>
                     <input name="Answer" asp-for="AnswerModel.Answer"/>
                 </form>
             }
             else if(Model.Type == "closed")
             {
                 <form id="AnswerForm">
-                    <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden class="margin-top-5"/>
+                    <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden class="margin-top-10"/>
                     <select name="Answer" asp-for="AnswerModel.Answer">
                         @if (Model?.Answers != null)
                         {
