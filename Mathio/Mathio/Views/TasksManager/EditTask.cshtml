@@ -98,6 +98,8 @@ ul.answers{
 <div class="catcher col-sm-12 margin-top-20">
     <div class="title"><h2>Edycja zadań</h2></div>
     <form asp-action="EditTask" id="taskForm">
+        @Html.Hidden("SelfRefId", Model.SelfReference?.Id)
+        @Html.Hidden("AuthorRefId", Model.AuthorReference?.Id)
         <div class="block-of-content">
             <p class="text-danger" style="text-align: center">@ViewData["error_msg"]</p>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -147,7 +149,7 @@ ul.answers{
         </div>
         <div class="questions_block catcher">
             <div id="questions">
-                @Html.EditorFor(m=>m.Questions)
+                @Html.EditorFor(m => m.Questions)
             </div>
             <center><button id="addQuestion" type="button" class="btn btn-primary button-extra margin-top-20">Dodaj pytanie</button></center>
         </div>
