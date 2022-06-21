@@ -5,29 +5,158 @@
     Layout = "_Layout";
 }
 
-<h2>Podsumowanie</h2>
-<p>@Model.Task.Title</p>
-<p>@Model.Task.Category</p>
-<p>@Model.Task.Description</p>
-<p>@Model.Task.LastUpdate?.ToDateTime()</p>
-<p>@Model.Task.Author?.UserName</p>
+<style>
 
-<h3>Odpowiedzi</h3>
-<table class="table-bordered table">
-    @{
-        if (Model.testQuestions != null)
-        {
-            var i = 0;
-            foreach (var q in Model.testQuestions)
-            {
-                i++;
+body{
+    background-color: #EEEEEE;
+}
+
+.content{
+    margin: auto;
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    min-width: 375px;
+    align-content: center;
+}
+
+.margin-top-25{
+    margin-top: 25px;
+}
+
+.field-group-extra{
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.submit-group-extra{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.field-extra{
+    margin-top: 20px;
+    border-radius: 25px;
+}
+
+.submit-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.submit-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #FFFFFF;
+    color: #222222;
+    border: 2px #E0E0E0 solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra:hover{
+    background-color: #F0F0F0;
+    color: #222222;
+    border: 2px #CCCCCC solid;
+    text-shadow: 0 0 0.5px #888888;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.hide{
+    display: none;
+}
+
+.main-name{
+    color: #FEFEFE;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    background-color: #088AFC;
+    width: 100%;
+    padding: 10px;
+    min-width: 375px;
+    align-content: center;
+}
+
+.news{
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.answer {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.margin-top-10{
+    margin-top: 10px;
+}
+
+</style>
+
+<div class="row">
+
+    <div class="col-0 col-sm-2 col-md-3"></div>
+
+    <div class="col-12 col-sm-8 col-md-6">
+        <div class="main-name margin-top-25">Podsumowanie</div>
+        <div class="content">
+            <center>
+                <table>
+                    <tr><td style="text-align: right; margin-right: 5px;"><b>Tytuł:  </b></td><td style="text-align: left;">@Model.Task.Title</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px;"><b>Kategoria:  </b></td style="text-align: left;"><td>@Model.Task.Category</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px;"><b>Opis:  </b></td><td style="text-align: left;">@Model.Task.Description</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px;"><b>Data:  </b></td><td style="text-align: left;">@Model.Task.LastUpdate?.ToDateTime()</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px;"><b>Autor:  </b></td><td style="text-align: left;">@Model.Task.Author?.UserName</td></tr>
+                </table>
+            </center>
+        </div>
+        <div class="main-name">Odpowiedzi</div>
+        <div class="content">
+            <table class="table-bordered table answer margin-top-10">
                 <tr>
-                    <td>Pytanie @i</td><td>@q.Question</td><td>@q.AnswerModel.Answer</td>
+                    <td><b>Nr</b></td><td><b>Pytanie</b></td><td><b>Odpowiedź</b></td>
                 </tr>
-            }
-        }
-    }
-</table>
+                @{
+                    if (Model.testQuestions != null)
+                    {
+                        var i = 0;
+                        foreach (var q in Model.testQuestions)
+                        {
+                            i++;
+                            <tr>
+                                <td>@i</td><td>@q.Question</td><td>@q.AnswerModel.Answer</td>
+                            </tr>
+                        }
+                    }
+                }
+            </table>
 
-<btn class="btn btn-success" onclick="location.href='@Url.Action("Result", "Tasks", new {id=Model.Task.SelfReference?.Id})'">Zapisz podejście</btn>
-<btn class="btn btn-info" onclick="location.href='@Url.Action("Questions", "Tasks", new {id=Model.Task.SelfReference?.Id})'">Powrót do pytań</btn>
+            <btn class="btn submit-extra" onclick="location.href='@Url.Action("Result", "Tasks", new {id=Model.Task.SelfReference?.Id})'">Zapisz podejście</btn>
+            <btn class="btn button-extra" onclick="location.href='@Url.Action("Questions", "Tasks", new {id=Model.Task.SelfReference?.Id})'">Powrót do pytań</btn>
+
+        </div>
+    </div>
+
+    <div class="col-0 col-sm-2 col-md-3"></div>
+</div>
