@@ -10,14 +10,14 @@
             {
                 <form id="AnswerForm">
                     <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden/>
-                    <input name="Answer" asp-for="AnswerModel.Answer"/>
+                    <input name="Answer" asp-for="AnswerModel.Answer" class="margin-top-5"/>
                 </form>
             }
             else if(Model.Type == "closed")
             {
                 <form id="AnswerForm">
                     <input name="QuestionId" asp-for="AnswerModel.QuestionId" hidden/>
-                    <select name="Answer" asp-for="AnswerModel.Answer">
+                    <select name="Answer" asp-for="AnswerModel.Answer" class="margin-top-5">
                         @if (Model?.Answers != null)
                         {
                             foreach (var answer in Model.Answers)

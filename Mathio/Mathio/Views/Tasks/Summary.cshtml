@@ -22,10 +22,6 @@ body{
     align-content: center;
 }
 
-.margin-top-25{
-    margin-top: 25px;
-}
-
 .field-group-extra{
     margin-top: 0px;
     margin-bottom: 5px;
@@ -112,6 +108,10 @@ body{
     margin-top: 10px;
 }
 
+.margin-top-25{
+    margin-top: 25px;
+}
+
 </style>
 
 <div class="row">
@@ -123,11 +123,11 @@ body{
         <div class="content">
             <center>
                 <table>
-                    <tr><td style="text-align: right; margin-right: 5px;"><b>Tytuł:  </b></td><td style="text-align: left;">@Model.Task.Title</td></tr>
-                    <tr><td style="text-align: right; margin-right: 5px;"><b>Kategoria:  </b></td><td style="text-align: left;">@Model.Task.Category</td></tr>
-                    <tr><td style="text-align: right; margin-right: 5px;"><b>Opis:  </b></td><td style="text-align: left;">@Model.Task.Description</td></tr>
-                    <tr><td style="text-align: right; margin-right: 5px;"><b>Data:  </b></td><td style="text-align: left;">@Model.Task.LastUpdate?.ToDateTime()</td></tr>
-                    <tr><td style="text-align: right; margin-right: 5px;"><b>Autor:  </b></td><td style="text-align: left;">@Model.Task.Author?.UserName</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px; color: #444;"><b>Tytuł:  </b></td><td style="text-align: left;">@Model.Task.Title</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px; color: #444;"><b>Kategoria:  </b></td><td style="text-align: left;">@Model.Task.Category</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px; color: #444;"><b>Opis:  </b></td><td style="text-align: left;">@Model.Task.Description</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px; color: #444;"><b>Data:  </b></td><td style="text-align: left;">@Model.Task.LastUpdate?.ToDateTime()</td></tr>
+                    <tr><td style="text-align: right; margin-right: 5px; color: #444;"><b>Autor:  </b></td><td style="text-align: left;">@Model.Task.Author?.UserName</td></tr>
                 </table>
             </center>
         </div>
