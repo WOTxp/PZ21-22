@@ -99,6 +99,7 @@ ul.answers{
     <div class="title"><h2>Tworzenie zadań</h2></div>
     <form asp-action="AddTask" id="taskForm">
         <div class="block-of-content">
+            <p class="text-danger" style="text-align: center">@ViewData["error_msg"]</p>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group text-center field-group-extra">
                 <label asp-for="Category" class="control-label hide display-none"></label>
@@ -126,14 +127,15 @@ ul.answers{
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group text-center field-group-extra">
-                <label asp-for="Description" class="control-label hide dipslay-none"></label>
+                <label asp-for="Description" class="control-label hide display-none"></label>
                 <h5 class="margin-top-10">Opis</h5>
                 <textarea asp-for="Description" class="form-control field-extra" id="description"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group text-center field-group-extra">
-                <label asp-for="QuestionsPerTest" class="control-label hide dipslay-none"></label>
-                <input asp-for="QuestionsPerTest" class="form-control field-extra" placeholder="Opis"/>
+                <label asp-for="QuestionsPerTest" class="control-label hide display-none"></label>
+                <h5 class="margin-top-10">Liczba pytań w teście</h5>
+                <input asp-for="QuestionsPerTest" class="form-control field-extra" placeholder="Ilość"/>
                 <span asp-validation-for="QuestionsPerTest" class="text-danger"></span>
             </div>
         </div>
@@ -157,14 +159,31 @@ ul.answers{
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
+        function ReEnumerate(){
+            let page = 1;
+            $("#lessons > .lesson").each(function (i, e){
+                if (!$(e).is(":hidden")){
+                    $(e).find(".page-input").val(page);
+                    page += 1;
+                }
+            });    
+        }
         $("#addLesson").on("click", function () {
             $.ajax({
                 type: "POST",
                 data: $("#taskForm").serialize(),
                 url: '@Url.Action("AddLesson", "TasksManager")',
                 success: function (response) {
-                    alert(response);
                     $("#lessons").html(response);
+                    ReEnumerate();
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl=/TasksManager/AddTask");
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });
@@ -175,8 +194,15 @@ ul.answers{
                 data: $("#taskForm").serialize(),
                 url: '@Url.Action("AddQuestion", "TasksManager")',
                 success: function (response) {
-                    alert(response)
                     $("#questions").html(response);
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl=/TasksManager/AddTask");
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });
@@ -184,11 +210,20 @@ ul.answers{
         $("#lessons").on("click", ".del_lesson", function (){
             $(this).parents(".lesson").attr("hidden",true);
             $(this).parents(".lesson").find(".deleted").val("True");
+            ReEnumerate();
         });
-        
-        $("#questions").on("click", ".del_question", function (){
+        let questions = $("#questions");
+        questions.on("click", ".del_question", function (){
             $(this).parents(".question").attr("hidden",true);
             $(this).parents(".question").find(".deleted").val("True");
+        });
+        
+        questions.on("change", ".type-select", function (e){
+            let v = $(e.target).val();
+            if (v === "closed")
+                $(this).parents(".question").find(".answers-box").attr("hidden", false);
+            else if (v === "open")
+                $(this).parents(".question").find(".answers-box").attr("hidden", true);
         });
     </script>
 }

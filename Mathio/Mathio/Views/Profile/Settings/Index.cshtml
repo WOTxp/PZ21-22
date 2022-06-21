@@ -145,7 +145,8 @@ a:link{
                 <span class="text-danger" asp-validation-for="Description"></span>
                 <button type="button" class="btn btn-primary button-extra" onclick="ChangeDescription()">Zmień</button>
                 <br/>
-            </form>
+            </form><hr class="margin-top-20">
+            <a href="/Profile/Settings/ChangePassword" class="btn btn-primary button-extra">Zmień hasło</a>
             <h5 id="success" class="text-success margin-top-20">@TempData["Success"]</h5>
             <h5 id="error" class="text-danger margin-top-20"></h5>
         </div>

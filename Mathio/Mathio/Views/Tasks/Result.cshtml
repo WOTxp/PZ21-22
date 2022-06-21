@@ -1,0 +1,19 @@
+﻿@model TestHistoryModel
+
+@{
+    ViewData["Title"] = "Result";
+    Layout = "_Layout";
+}
+
+<h2>Zadanie</h2>
+
+<p>@Model.Task?.Title</p>
+<p>@Model.Task?.Category</p>
+<p>@Model.Task?.Description</p>
+<p>@Model.Task?.LastUpdate?.ToDateTime()</p>
+<p>@Model.Task?.Author?.UserName</p>
+
+<h2>Wynik</h2>
+<p>@Model.Score / @Model.Task?.QuestionsPerTest</p>
+<p>@Model.Date?.ToDateTime()</p>
+<p>Gratulacje</p>

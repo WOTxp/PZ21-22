@@ -4,60 +4,187 @@
     Layout = "_Layout";
 }
 
-<h2>Edit Task</h2>
-<p>@ViewData["error_msg"]</p>
-<form asp-action="EditTask" id="taskForm">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input name="SelfRefId" value="@Model.SelfReference.Id" hidden/>
-    <input name="AuthorRefId" value="@Model.AuthorReference.Id" hidden/>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Category" class="control-label hide"></label>
-        <input asp-for="Category" class="form-control field-extra" placeholder="Kategoria"/>
-        <span asp-validation-for="Category" class="text-danger"></span>
-    </div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Title" class="control-label hide"></label>
-        <input asp-for="Title" class="form-control field-extra" placeholder="Tytuł"/>
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="Description" class="control-label hide"></label>
-        <input asp-for="Description" class="form-control field-extra" placeholder="Opis"/>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <div class="form-group text-center field-group-extra">
-        <label asp-for="QuestionsPerTest" class="control-label hide"></label>
-        <input asp-for="QuestionsPerTest" class="form-control field-extra" placeholder="Opis"/>
-        <span asp-validation-for="QuestionsPerTest" class="text-danger"></span>
-    </div>
-    <h4>Lessons</h4>
-    <div id="lessons">
-        @Html.EditorFor(m => m.Lessons)
-    </div>
-    <div class="pt-3">
-       <button class="btn btn-primary" id="addLesson" type="button">Add Lesson</button> 
-    </div>
-    <h4>Questions</h4>
-    <div id="questions">
-        @Html.EditorFor(m => m.Questions)
-    </div>
-    <div class="pt-3">
-        <button class="btn btn-primary" id="addQuestion" type="button">Add Question</button>
-        <input type="submit" value="Dodaj" class="btn btn-primary submit-extra"/>
-    </div>
-</form>
+<style>
+body{
+    background-color: #EEE;
+}
+
+.block-of-content{
+    margin: 10px;
+    margin-top: 0px;
+    padding: 30px;
+    background-color: #FFF;
+    padding-bottom: 30px;
+}
+
+.title{
+    background-color: #088AFC;
+    text-align: center;
+    color: #FFF;
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top : 0px;
+}
+
+#control-buttons{
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    padding-bottom: 60px;
+    background-color: #FFF;
+}
+
+.left{
+    float: left;
+}
+
+.right{
+    float: right;
+}
+
+.margin-right-10{
+    margin-right: 10px;
+}
+
+.margin-top-10{
+    margin-top: 10px;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}
+
+.display-none{
+    display: none;
+}
+
+.dblock{
+    display: block;
+}
+
+ul.answers{
+    list-style-type: circle;
+}
+
+.catcher{
+    float: left;
+}
+
+.button-extra{
+    margin-top: 30px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.button-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+</style>
+
+<div class="catcher col-sm-12 margin-top-20">
+    <div class="title"><h2>Edycja zadań</h2></div>
+    <form asp-action="EditTask" id="taskForm">
+        @Html.Hidden("SelfRefId", Model.SelfReference?.Id)
+        @Html.Hidden("AuthorRefId", Model.AuthorReference?.Id)
+        <div class="block-of-content">
+            <p class="text-danger" style="text-align: center">@ViewData["error_msg"]</p>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="Category" class="control-label hide display-none"></label>
+                <h5 class="margin-top-10">Kategoria</h5>
+                <select asp-for="Category" class="form-control field-extra">
+                    <option>Dodawanie i odejmowanie</option>
+                    <option>Mnożenie i dzielenie</option>
+                    <option>Potęgowanie</option>
+                    <option>Pierwiastkowanie</option>
+                    <option>Funkcje liniowe</option>
+                    <option>= b^2 - 4ac</option>
+                    <option>Funkcje kwadratowe</option>
+                    <option>Figury geometryczne</option>
+                    <option>Liczby zespolone</option>
+                    <option>Granice</option>
+                    <option>Pochodne</option>
+                    <option>Całki</option>
+                </select>
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="Title" class="control-label hide display-none"></label>
+                <h5 class="margin-top-10">Tytuł</h5>
+                <input asp-for="Title" class="form-control field-extra" placeholder="Tytuł"/>
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="Description" class="control-label hide display-none"></label>
+                <h5 class="margin-top-10">Opis</h5>
+                <textarea asp-for="Description" class="form-control field-extra" id="description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group text-center field-group-extra">
+                <label asp-for="QuestionsPerTest" class="control-label hide display-none"></label>
+                <h5 class="margin-top-10">Liczba pytań w teście</h5>
+                <input asp-for="QuestionsPerTest" class="form-control field-extra" placeholder="Ilość"/>
+                <span asp-validation-for="QuestionsPerTest" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="lessons_block catcher">
+            <div id="lessons">
+                @Html.EditorFor(m => m.Lessons)
+            </div>
+            <center><button id="addLesson" type="button" class="btn btn-primary button-extra margin-top-20">Dodaj lekcję</button></center>
+        </div>
+        <div class="questions_block catcher">
+            <div id="questions">
+                @Html.EditorFor(m => m.Questions)
+            </div>
+            <center><button id="addQuestion" type="button" class="btn btn-primary button-extra margin-top-20">Dodaj pytanie</button></center>
+        </div>
+        <center><input type="submit" value="Zapisz zmiany" class="btn btn-primary button-extra margin-top-20"/></center>
+    </form>
+</div>      
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
+        function ReEnumerate(){
+            let page = 1;
+            $("#lessons > .lesson").each(function (i, e){
+                if (!$(e).is(":hidden")){
+                    $(e).find(".page-input").val(page);
+                    page += 1;
+                }
+            });    
+        }
         $("#addLesson").on("click", function () {
             $.ajax({
                 type: "POST",
                 data: $("#taskForm").serialize(),
                 url: '@Url.Action("AddLesson", "TasksManager")',
                 success: function (response) {
-                    alert(response);
                     $("#lessons").html(response);
+                    ReEnumerate();
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl="+location.href);
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });
@@ -68,8 +195,15 @@
                 data: $("#taskForm").serialize(),
                 url: '@Url.Action("AddQuestion", "TasksManager")',
                 success: function (response) {
-                    alert(response)
                     $("#questions").html(response);
+                },
+                error: function (xhr){
+                    if (xhr.status===401){
+                        location.replace("/Profile/SignIn?returnUrl="+location.href);
+                    }
+                    else {
+                        alert(xhr.status);
+                    }
                 }
             });
         });
@@ -77,11 +211,37 @@
         $("#lessons").on("click", ".del_lesson", function (){
             $(this).parents(".lesson").attr("hidden",true);
             $(this).parents(".lesson").find(".deleted").val("True");
+            ReEnumerate();
         });
         
-        $("#questions").on("click", ".del_question", function (){
+        let questions = $("#questions");
+        questions.on("click", ".del_question", function (){
             $(this).parents(".question").attr("hidden",true);
             $(this).parents(".question").find(".deleted").val("True");
+        });
+        
+        questions.on("change", ".type-select", function (e){
+            let v = $(e.target).val();
+            if (v === "closed")
+                $(this).parents(".question").find(".answers-box").attr("hidden", false);
+            else if (v === "open")
+                $(this).parents(".question").find(".answers-box").attr("hidden", true);
+        });
+    </script>
+
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+        language: 'pl',
+        selector: '#description',
+        plugins: [
+            'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+            'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+            'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+        ],
+        toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+            'alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
         });
     </script>
 }

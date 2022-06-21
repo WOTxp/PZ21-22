@@ -4,73 +4,216 @@
     Layout = "_Layout";
 }
 
-<div>
-    @Model.Task.Category
-    @Model.Task.Title
-    @Model.Task.Description
-    @Model.Task.Author?.UserName
-    @Model.Task.Author?.Points
-    @Model.Task.LastUpdate
+<style>
+
+body{
+    background-color: #EEEEEE;
+}
+
+.content{
+    margin: auto;
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    min-width: 375px;
+    align-content: center;
+}
+
+.field-group-extra{
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.submit-group-extra{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.field-extra{
+    margin-top: 20px;
+    border-radius: 25px;
+}
+
+.submit-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #088AFC;
+    color: #FFFFFF;
+    border: 2px #0872FC solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.submit-extra:hover{
+    background-color: #0872FC;
+    color: #FFFFFF;
+    border: 2px #086AFC solid;
+    text-shadow: 0 0 0.5px #EEEEEE;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra{
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 25px;
+    background-color: #FFFFFF;
+    color: #222222;
+    border: 2px #E0E0E0 solid;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.button-extra:hover{
+    background-color: #F0F0F0;
+    color: #222222;
+    border: 2px #CCCCCC solid;
+    text-shadow: 0 0 0.5px #888888;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+}
+
+.hide{
+    display: none;
+}
+
+.main-name{
+    color: #FEFEFE;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    background-color: #088AFC;
+    width: 100%;
+    padding: 10px;
+    min-width: 375px;
+    align-content: center;
+}
+
+.news{
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+td {
+  text-align: center;
+  vertical-align: top;
+}
+
+.margin-top-5{
+    margin-top: 5px;
+}
+
+.margin-top-10{
+    margin-top: 10px;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}
+
+.margin-top-25{
+    margin-top: 25px;
+}
+
+</style>
+
+<div class="row">
+    <div class="col-sm-0 col-md-0 col-lg-2"></div>
+
     
-    <p>Pytanie @TempData["num"]/@Model.Task.QuestionsPerTest</p>
-    @{
-        await Html.RenderPartialAsync("_Question", model: Model.currentQuestion);
-    }
-    @{
-        var num = (int) (TempData["num"] ?? 0);
-        if (num == 1)
-        {
-            <div class="pt-3">
-                <button type="button" class="btn btn-primary" id = "prev" disabled>Poprzedni</button>
-                <button type="button" class="btn btn-primary" id = "next">Nastepny</button>
-            </div>
-        }
-        else if (num == Model.Task.QuestionsPerTest)
-        {
-            <div class="pt-3">
-                <button type="button" class="btn btn-primary" id = "prev">Poprzedni</button>
-                <button type="button" class="btn btn-primary" id = "finish">Zakończ</button>
-                <button type="button" class="btn btn-primary" id = "next" disabled>Nastepny</button>
-            </div>
+    <div class="col-sm-12 col-md-5 col-lg-3">
+        <div class="main-name margin-top-20">Pytanie @TempData["num"]/@Model.Task.QuestionsPerTest</div>
+        <div class="content">
+            <center>
+                @{
+                    await Html.RenderPartialAsync("_Question", model: Model.currentQuestion);
+                }
+                @{
+                    var num = (int) (TempData["num"] ?? 0);
+                    if (num == 1)
+                    {
+                        <div class="pt-3">
+                            <button type="button" class="btn btn-primary" id = "prev" disabled>Poprzedni</button>
+                            <button type="button" class="btn btn-primary" id = "next">Nastepny</button>
+                        </div>
+                    }
+                    else if (num == Model.Task.QuestionsPerTest)
+                    {
+                        <div class="pt-3">
+                            <button type="button" class="btn btn-primary" id = "prev">Poprzedni</button>
+                            <button type="button" class="btn btn-primary" id = "finish">Zakończ</button>
+                            <button type="button" class="btn btn-primary" id = "next" disabled>Nastepny</button>
+                        </div>
             
-        }
-        else if (num > 1 && num < Model.Task.QuestionsPerTest)
-        {
-            <div class="pt-3">
-                <button type="button" class="btn btn-primary" id = "prev">Poprzedni</button>
-                <button type="button" class="btn btn-primary" id = "next">Nastepny</button>
-            </div>
-        }
-        else
-        {
-            <div class="pt-3">
-                <button type="button" class="btn btn-primary" id = "return" onclick="location.href='@Url.Action("Questions" , "Tasks", new {id=Model.Task.SelfReference?.Id})'">Wróc</button>
-            </div>
-        }
-    }
+                    }
+                    else if (num > 1 && num < Model.Task.QuestionsPerTest)
+                    {
+                        <div class="pt-3">
+                            <button type="button" class="btn btn-primary" id = "prev">Poprzedni</button>
+                            <button type="button" class="btn btn-primary" id = "next">Nastepny</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="pt-3">
+                            <button type="button" class="btn btn-primary" id = "return" onclick="location.href='@Url.Action("Questions" , "Tasks", new {id=Model.Task.SelfReference?.Id})'">Wróc</button>
+                        </div>
+                    }
+                }
+            </center>
+        </div>
+    </div>
+
+    <div class="col-sm-0 col-md-2"></div>
+
+    <div class="col-sm-12 col-md-5 col-lg-3">
+        <div class="main-name margin-top-20">Informacje</div>
+        <div class="content">
+            <table>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Kategoria: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Category</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Tytuł: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Title</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Opis: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Description</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Autor: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Author?.UserName</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Punkty: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.Author?.Points</i></tr>
+                <tr><td style="text-align: right; margin-right: 5px; color: #444; padding: 2px;"><b>Kategoria: </b></td><td style="text-align: left; padding: 2px;"><i>@Model.Task.LastUpdate</i></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-sm-0 col-md-0 col-lg-2"></div>
 </div>
 <script type="text/javascript" defer>
-function SaveAnswer(){
+function SaveAnswer(href){
     let d = $("#AnswerForm").serialize();
         $.ajax({
             type: "POST",
             url: '/Tasks/SaveAnswer',
             dataType: 'json',
             data: d,
-            success: function (response) {
-                alert(response["msg"]);
+            success: function () {
+                location.href = href;
+            },
+            error: function (xhr){
+                if (xhr.status===401){
+                    location.replace("/Profile/SignIn?returnUrl="+location.href);
+                }
+                else {
+                    alert(xhr.status);
+                }
             }
         });
 }
 $("#prev").on("click", function () {
-  SaveAnswer();
-  location.href='@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 2)-1})'
+  SaveAnswer('@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 2)-1})');
 });
 $("#next").on("click", function () {
-    SaveAnswer();
-    location.href = '@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 0)+1})'
+    SaveAnswer('@Url.Action("Questions", "Tasks" , new {id=Model.Task.SelfReference?.Id, num=(int)(TempData["num"] ?? 0)+1})');
 });
 $("#finish").on("click", function () {
-    SaveAnswer();
+    SaveAnswer('@Url.Action("Summary","Tasks", new {id=Model.Task.SelfReference?.Id})');
 });
 </script>

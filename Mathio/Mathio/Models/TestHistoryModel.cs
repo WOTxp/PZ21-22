@@ -12,7 +12,7 @@ public class TestHistoryModel
     public Timestamp? Date { get; set; }
     [FirestoreProperty]
     public DocumentReference? TaskReference { get; set; }
-    public TasksModel? Task { get; private set; }
+    public TasksModel? Task { get; set; }
 
     public async Task<TasksModel?> DownloadTask()
     {
